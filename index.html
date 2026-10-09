@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7ead9">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="おはぎを押しつけろ！">
+  <meta property="og:title" content="おはぎを押しつけろ！">
+  <meta property="og:description" content="長押しでおはぎを押しつけ、反撃をかわそう！">
+  <meta property="og:url" content="https://akamakimaki.github.io/ohagi-push/">
+  <meta property="og:image" content="https://akamakimaki.github.io/ohagi-push/images/link-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="おはぎを押しつけろ！">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>おはぎを押しつけろ！</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./style.css?v=20261009-1">
+  <script src="./action-game.js?v=20261009-1" defer></script>
+</head>
+
+<body>
+  <main>
+    <header class="game-header">
+      <img class="title-logo" src="./images/title-push.png" alt="おはぎを押しつけろ！">
+    </header>
+
+    <div class="toolbar">
+      <span>自己ベスト <b id="best">0</b> 点</span>
+      <button id="sound" class="small-button" type="button" aria-pressed="true">♪ 音 ON</button>
+    </div>
+
+    <div class="scoreboard">
+      <div id="clock"><span>のこり</span> <strong id="time">30.0</strong><span>秒</span></div>
+      <div><span>食べさせた</span> <strong id="score">0</strong><span>個</span></div>
+      <div><span>得点</span> <strong id="points">0</strong><span>点</span></div>
+      <div id="comboPanel"><strong id="combo">0</strong><span>れんぞく</span></div>
+    </div>
+    <div class="time-track" aria-hidden="true">
+      <div id="timeBar"></div>
+    </div>
+
+    <div id="stage" role="button" tabindex="0" aria-label="ゲーム画面。マウスまたは指で押したまま義勇を動かし、実弥の突進を回避する">
+
+      <!-- ゲーム処理とは独立した竹林背景 -->
+      <div class="bamboo-bg" aria-hidden="true">
+        <i class="bamboo bamboo-1"></i>
+        <i class="bamboo bamboo-2"></i>
+        <i class="bamboo bamboo-3"></i>
+        <i class="bamboo bamboo-4"></i>
+        <i class="bamboo bamboo-5"></i>
+        <i class="bamboo bamboo-6"></i>
+      </div>
+      <p id="hint" class="hint">画面を押したまま、義勇を動かそう！</p>
+      <div class="pressure-ui" aria-label="押しつけゲージ">
+        <span>おはぎ</span>
+        <div class="pressure-track">
+          <div id="pressureBar"></div>
+        </div>
+        <b id="pressureText">0%</b>
+      </div>
+
+      <div id="warning" aria-hidden="true"><span>💢</span><b>くるぞ！</b></div>
+      <div id="finalRush" hidden aria-hidden="true">
+        <strong aria-label="あと10秒">
+          <b>10</b><small>秒</small>
+        </strong>
+        <span>実弥、ブチギレ！</span>
+      </div>
+      <div id="effect" aria-hidden="true"></div>
+      <div id="burst" aria-hidden="true"></div>
+      <!-- 💦などの一時的な演出を置く領域 -->
+      <div id="projectiles" aria-hidden="true"></div>
+      <!-- 実弥の攻撃で画面を横切る風 -->
+      <div id="windEffect" aria-hidden="true">
+        <i class="wind-line"></i>
+        <i class="wind-line"></i>
+        <i class="wind-line"></i>
+      </div>
+
+      <div id="giyu" class="actor">
+        <img id="giyuImage" src="./images/giyu-normal.png" alt="義勇" draggable="false">
+      </div>
+      <div id="sanemi" class="actor">
+        <img id="sanemiImage" src="./images/sanemi-normal.png" alt="実弥" draggable="false">
+      </div>
+    </div>
+
+    <section class="message-box" aria-live="polite" aria-atomic="true">
+      <h2 id="result">実弥をかわして、食べさせろ！</h2>
+      <p id="message">押したまま、義勇を自由に動かせるよ！</p>
+    </section>
+
+    <button id="action" type="button">30秒チャレンジ、はじめる！</button>
+    <footer>
+      マウス・指で押したまま自由移動<br>
+      突進をかわせば、おはぎチャンス！
+    </footer>
+    <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
+  </main>
+
+  <div id="timeUpFlash" class="time-up-flash" hidden aria-hidden="true">
+    <strong>TIME UP!</strong>
+    <span>おはぎ押しつけ終了！</span>
+  </div>
+
+  <section id="ending" class="ending" role="dialog" aria-modal="true" aria-labelledby="endingTitle" hidden>
+    <div class="ending-actors" aria-hidden="true">
+      <img class="ending-giyu" src="./images/giyu-attack.png" alt="">
+      <img class="ending-sanemi" src="./images/sanemi-angry.png" alt="">
+    </div>
+    <div class="ending-card">
+      <p class="ending-kicker">TIME UP!</p>
+      <h2 id="endingTitle" tabindex="-1">押しつけた結果</h2>
+      <p class="ending-score"><strong id="endingScore">0</strong><span id="endingScoreLabel">点獲得！</span></p>
+      <p id="endingDetails" class="ending-details" hidden></p>
+      <p id="endingRecord" class="ending-record">自己ベスト 0点</p>
+      <div class="ending-history">
+        <h3>この端末の記録 TOP 5</h3>
+        <ol id="history"></ol>
+      </div>
+
+      <div class="rank-registration">
+        <button id="privateSubmit" type="button">
+          この得点を登録
+        </button>
+        <p id="recordNote">
+          自分の記録として保存できます
+        </p>
+        <a id="viewRanking" href="https://ohagi-ranking.makimaki-feed.net/?game=push&amp;view=mine" target="_blank"
+          rel="noopener noreferrer">
+          自分の記録を見る
+        </a>
+      </div>
+
+      <button id="playAgain" type="button">ゲーム画面へ戻る</button>
+      <button id="shareResult" type="button">🦋 Blueskyで結果を投稿</button>
+    </div>
+  </section>
+</body>
+
+</html>

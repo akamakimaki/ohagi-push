@@ -1,0 +1,6 @@
+﻿backup-before-*/
+*.zip
+変更内容.txt
+game.js
+Thumbs.db
+.DS_Store

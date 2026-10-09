@@ -1,0 +1,5659 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  --bean: #5d352b;
+  --bean-dark: #35201b;
+  --cream: #fffaf0;
+  --paper: #fffdf8;
+  --red: #c44237;
+  --gold: #e3a539;
+  --ink: #44352f;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  padding: 14px 16px 26px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% -20%, #fffefb 0 30%, transparent 60%),
+    linear-gradient(150deg, #f8edda, #ead4bd);
+  color: var(--ink);
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  font-weight: 700;
+}
+
+main {
+  width: min(100%, 480px);
+  text-align: center;
+}
+
+header {
+  margin-bottom: 10px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #996c43;
+  font-size: 10px;
+  letter-spacing: .25em;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.02;
+  letter-spacing: .05em;
+}
+
+header h1 strong {
+  color: var(--red);
+  font-size: 39px;
+  text-shadow: 2px 2px 0 white;
+}
+
+header>p:last-child {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+button {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.small-button {
+  padding: 8px 14px;
+  border: 1px solid #d7b58d;
+  border-radius: 30px;
+  color: var(--ink);
+  background: #fffaf3;
+  font-size: 13px;
+}
+
+/* スコアだけを表示するコンパクトなメーター */
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  width: fit-content;
+  min-width: 190px;
+  margin: 0 auto 8px;
+  padding: 7px 22px;
+
+  background: var(--paper);
+  border: 1px solid #d7b58d;
+  border-radius: 999px;
+
+  box-shadow:
+    0 3px 0 #d7b58d;
+}
+
+.scoreboard span {
+  font-size: 12px;
+}
+
+.scoreboard strong {
+  color: var(--red);
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 残り時間ゲージの外枠 */
+.time-track {
+  display: block;
+  width: min(92%, 560px);
+  height: 14px;
+  margin: 0 auto 12px;
+  overflow: hidden;
+
+  background: #4d392f;
+  border: 2px solid #76503b;
+  border-radius: 999px;
+
+  box-shadow:
+    inset 0 2px 3px #2c1d17aa,
+    0 2px 0 #fff8;
+}
+
+/* 残り時間。時間が減るほど右端が左へ移動する */
+#timeBar {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(90deg,
+      #e95464 0%,
+      #f2c94c 42%,
+      #71bd5a 100%);
+
+  border-radius: 999px;
+  box-shadow:
+    inset 0 2px #ffffff88,
+    0 0 8px #f2c94c;
+
+  transition: width .1s linear;
+}
+
+#clock.urgent strong {
+  color: #b80020;
+  animation: pulse .45s ease-in-out infinite alternate;
+}
+
+#stage {
+  --push: 0;
+  --giyu-x: 0px;
+  --sanemi-x: 0px;
+  --sanemi-charge-x: -125px;
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+  border: 3px solid #76503b;
+  border-radius: 12px;
+
+  /*
+   * レトロ竹林の下地。
+   * 竹そのものは.bamboo-bg内で描画する。
+   */
+  background:
+    linear-gradient(to bottom,
+      #b9d98a 0%,
+      #d8e6a1 64%,
+      #9a7041 64%,
+      #b9854e 100%);
+}
+
+#stage.pressing {
+  cursor: grabbing;
+  background-color: #fff7e7;
+}
+
+.hint {
+  position: absolute;
+  top: 10px;
+  z-index: 8;
+  width: 100%;
+  margin: 0;
+  color: #815f47;
+  font-size: 13px;
+}
+
+.pressure-ui {
+  position: absolute;
+  top: 39px;
+  left: 7%;
+  right: 7%;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: auto 1fr 42px;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+}
+
+.pressure-track {
+  height: 13px;
+  overflow: hidden;
+  border: 2px solid #725047;
+  border-radius: 20px;
+  background: #efe2ce;
+  box-shadow: inset 0 2px 4px #51301d30;
+}
+
+#pressureBar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #c99055, #7b4232 70%, #c43b32);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+#pressureText {
+  font-variant-numeric: tabular-nums;
+}
+
+.actor {
+  position: absolute;
+  top: 68%;
+  width: 112px;
+  height: 124px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.actor img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#giyu {
+  left: 16px;
+  transform: translate3d(var(--giyu-x), -50%, 0);
+  transition: filter .12s;
+  animation: giyu-idle .5s ease-in-out infinite alternate;
+}
+
+#sanemi {
+  right: 16px;
+  transform: translate3d(var(--sanemi-x), -50%, 0);
+}
+
+/*
+ * 通常画像自体は激しく揺らさない。
+ * 小さな上下運動は#sanemiのsanemi-idleが担当する。
+ */
+#sanemi img {
+  transform-origin: 50% 90%;
+  animation: none;
+}
+
+/*
+ * 長押し中は画像単体をゆらゆらさせず、
+ * 前へ踏み込む姿勢で固定する。
+ */
+#stage.pressing #giyu img {
+  animation: none;
+
+  transform:
+    rotate(-7deg) scale(1.04, 0.98);
+
+  transform-origin: 50% 90%;
+}
+
+#stage.counter #giyu {
+  filter: drop-shadow(0 0 9px #f0a92d);
+}
+
+#warning {
+  position: absolute;
+  top: 79px;
+  right: 19%;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: scale(.3);
+  pointer-events: none;
+}
+
+#warning span {
+  font-size: 34px;
+  line-height: 1;
+}
+
+#warning b {
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: white;
+  background: var(--red);
+  font-size: 12px;
+}
+
+#stage.warning #warning {
+  opacity: 1;
+  animation: warning-pop .14s ease-out both, warning-shake .12s .14s linear infinite;
+}
+
+/*
+ * ブルブルと赤色変化を別々のアニメとして同時実行。
+ * 0.9秒はJavaScriptの攻撃予兆時間と同じ。
+ */
+#stage.warning #sanemi img {
+  animation:
+    sanemi-rage-face 0.09s linear infinite,
+    sanemi-red-charge 0.9s ease-in forwards !important;
+}
+
+#stage.dodging #giyu {
+  animation: dodge .42s cubic-bezier(.2, .9, .25, 1) both;
+}
+
+
+#stage.hit {
+  animation: impact .22s linear;
+}
+
+#stage.hit #giyu {
+  z-index: 20;
+  /*
+   * おはぎKISSの失敗演出と同じ .75秒・ease-out。
+   * びくっとしてから左上へ飛び、小さく消える。
+   */
+  animation: giyu-fly-away .75s ease-out both;
+  will-change: transform, opacity;
+}
+
+/* おはぎKISSと同じ、拒否された瞬間の汗 */
+#stage.hit #giyu::before,
+#stage.hit #giyu::after {
+  content: "💦";
+  position: absolute;
+  z-index: 21;
+  font-size: 26px;
+  pointer-events: none;
+  animation: sweat-pop .45s ease-out both;
+}
+
+#stage.hit #giyu::before {
+  top: -10px;
+  left: -18px;
+  transform: scaleX(-1) rotate(-25deg);
+}
+
+#stage.hit #giyu::after {
+  top: 8px;
+  right: -16px;
+  animation-delay: .08s;
+}
+
+#stage.success #giyu {
+  animation: celebrate-left .55s ease-out both;
+}
+
+#stage.success #sanemi {
+  animation: celebrate-right .55s ease-out both;
+}
+
+#effect {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  z-index: 10;
+  font-size: 48px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+#burst {
+  position: absolute;
+  top: 91px;
+  z-index: 10;
+  width: 100%;
+  color: var(--red);
+  font-size: 27px;
+  font-weight: 900;
+  text-shadow: 2px 2px white, -2px -2px white;
+  pointer-events: none;
+}
+
+#stage.hit #burst,
+#stage.success #burst,
+#stage.just #burst {
+  animation: pop .3s ease-out both;
+}
+
+.message-box {
+  min-height: 82px;
+  margin: 12px 0;
+  padding: 11px 8px;
+  border: 1px solid #d9b993;
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+#result {
+  margin: 0 0 3px;
+  color: #a83c32;
+  font-size: 22px;
+}
+
+#message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#action {
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  color: white;
+  background: #9b493b;
+  box-shadow: 0 4px #663128;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+#action:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px #663128;
+}
+
+button:focus-visible,
+#stage:focus-visible {
+  outline: 3px solid #b04639;
+  outline-offset: 4px;
+}
+
+footer {
+  margin-top: 15px;
+  color: #765849;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.time-up-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  color: white;
+  background: #3f2119e8;
+}
+
+.time-up-flash[hidden] {
+  display: none;
+}
+
+.time-up-flash strong {
+  font-size: clamp(54px, 17vw, 92px);
+  line-height: 1;
+  transform: rotate(-5deg);
+  text-shadow: 5px 5px var(--red);
+  animation: time-pop .45s ease-out both;
+}
+
+.time-up-flash span {
+  margin-top: 16px;
+  font-size: 18px;
+}
+
+.ending[hidden] {
+  display: none;
+}
+
+.ending {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  background: linear-gradient(145deg, #f8eadceF, #dcb789ed);
+  isolation: isolate;
+}
+
+.ending-actors {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ending-actors img {
+  width: min(52vw, 360px);
+  opacity: .3;
+  filter: drop-shadow(0 18px 12px #5a2b1d44);
+}
+
+.ending-actors img:first-child {
+  transform: translate(20%, -3%) rotate(-8deg);
+}
+
+.ending-actors img:last-child {
+  transform: translate(-20%, 5%) rotate(8deg);
+}
+
+.ending-card {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 340px);
+  padding: 22px 18px;
+  border: 2px solid #c99b67;
+  border-radius: 24px;
+  background: #fffdf5ee;
+  box-shadow: 0 18px 60px #4d251e44;
+}
+
+.ending-kicker {
+  margin: 0;
+  color: var(--red);
+  font-size: 12px;
+  letter-spacing: .2em;
+}
+
+.ending-card h2 {
+  margin: 3px 0 6px;
+}
+
+.ending-score {
+  margin: 0;
+}
+
+.ending-score strong {
+  display: block;
+  color: var(--red);
+  font-size: 68px;
+  line-height: 1;
+}
+
+.ending-score span {
+  font-size: 20px;
+}
+
+.ending-details,
+.ending-record {
+  margin: 9px 0;
+  font-size: 13px;
+}
+
+.ending-record {
+  color: #a23830;
+  font-weight: 900;
+}
+
+.ending-history {
+  margin: 12px 0;
+  padding: 10px;
+  border-radius: 14px;
+  background: #f6ead8;
+}
+
+.ending-history h3 {
+  margin: 0 0 5px;
+  font-size: 12px;
+}
+
+.ending-history ol {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+}
+
+.ending-history li {
+  display: flex;
+  flex-direction: column;
+}
+
+.ending-history strong {
+  font-size: 18px;
+}
+
+.rank-registration {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.rank-registration button,
+#playAgain,
+#shareResult {
+  width: 100%;
+  padding: 11px;
+  border-radius: 13px;
+}
+
+.rank-registration button,
+#playAgain {
+  color: white;
+  background: #9b493b;
+}
+
+#shareResult {
+  margin-top: 8px;
+  color: #fff;
+  background: #1683c7;
+}
+
+#recordNote {
+  margin: 0;
+  color: #80685d;
+  font-size: 10px;
+}
+
+#viewRanking {
+  color: #795044;
+  font-size: 12px;
+}
+
+@keyframes resist {
+  50% {
+    transform: translateX(3px) rotate(2deg);
+  }
+}
+
+@keyframes shove {
+  from {
+    transform: translateX(0) rotate(-1deg);
+  }
+
+  to {
+    transform: translateX(4px) rotate(2deg);
+  }
+}
+
+/*
+ * 義勇の格闘ゲーム風の構え。
+ * 左右位置はJavaScriptのleftで動かし、
+ * CSSは上下の小刻みな動きだけを担当する。
+ */
+@keyframes giyu-idle {
+  from {
+    transform: translate3d(0, -50%, 0) rotate(-2deg);
+  }
+
+  to {
+    transform: translate3d(0, calc(-50% - 9px), 0) rotate(2deg);
+  }
+}
+
+@keyframes warning-pop {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes warning-shake {
+  50% {
+    translate: 4px 0;
+  }
+}
+
+
+@keyframes dodge {
+  0% {
+    transform: translate3d(var(--giyu-x), -50%, 0);
+  }
+
+  45%,
+  100% {
+    transform: translate3d(calc(var(--giyu-x) - 58px), calc(-50% - 8px), 0) rotate(-13deg);
+  }
+}
+
+@keyframes attack {
+  0% {
+    transform: translate3d(var(--sanemi-x), -50%, 0);
+  }
+
+  70%,
+  100% {
+    transform: translate3d(calc(var(--sanemi-x) - 88px), -50%, 0) rotate(-9deg);
+  }
+}
+
+
+@keyframes giyu-fly-away {
+  0% {
+    opacity: 1;
+    transform:
+      translate3d(0, -50%, 0) rotate(0deg) scale(1);
+  }
+
+  /* おはぎKISSと同じ、最初にびくっと跳ねる */
+  22% {
+    transform:
+      translate3d(10px, calc(-50% - 10px), 0) rotate(7deg) scale(1.06);
+  }
+
+  /* 左上へ勢いよく吹き飛ぶ */
+  58% {
+    opacity: 1;
+    transform:
+      translate3d(-125px, calc(-50% - 125px), 0) rotate(-155deg) scale(.68);
+  }
+
+  /* おはぎKISSらしく、遠くで小さくなって消える */
+  100% {
+    opacity: 0;
+    transform:
+      translate3d(-285px, calc(-50% - 205px), 0) rotate(-390deg) scale(.06);
+  }
+}
+
+@keyframes sweat-pop {
+  from {
+    opacity: 0;
+    scale: .35;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+
+@keyframes celebrate-left {
+  50% {
+    transform: translate3d(calc(var(--giyu-x) + 18px), calc(-50% - 18px), 0) rotate(5deg);
+  }
+}
+
+@keyframes celebrate-right {
+  50% {
+    transform: translate3d(calc(var(--sanemi-x) - 12px), calc(-50% - 12px), 0) rotate(-4deg);
+  }
+}
+
+@keyframes impact {
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(.3);
+    opacity: 0;
+  }
+
+  75% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes time-pop {
+  from {
+    opacity: 0;
+    transform: scale(.2) rotate(-5deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-5deg);
+  }
+}
+
+@media (max-width: 420px) {
+  #stage {
+    height: 245px;
+  }
+
+  .actor {
+    width: 104px;
+    height: 114px;
+  }
+
+  #giyu {
+    left: 12px;
+  }
+
+  #sanemi {
+    right: 12px;
+  }
+
+  header h1 {
+    font-size: 24px;
+  }
+
+  header h1 strong {
+    font-size: 34px;
+  }
+}
+
+/*
+ * 実弥の通常待機。
+ * じっとせず、左右へ踏み込みながら跳ねる。
+ */
+#sanemi {
+  animation: sanemi-idle .32s ease-in-out infinite alternate;
+}
+
+/* 反撃前：全身を激しくブルブルさせる */
+#stage.warning #sanemi {
+  filter:
+    drop-shadow(0 0 8px #ff473b) drop-shadow(0 0 15px #ffb23b);
+
+  animation: sanemi-rage-body .075s steps(2, end) infinite;
+}
+
+/* 攻撃時は義勇へ勢いよく突進する */
+#stage.attacking #sanemi {
+  z-index: 6;
+  animation: sanemi-lunge .34s cubic-bezier(.15, .8, .25, 1) both;
+}
+
+/* 攻撃後は勢い余ってよろける */
+#stage.cooldown #sanemi {
+  animation: sanemi-stumble .58s ease-out both;
+}
+
+@keyframes sanemi-idle {
+  0% {
+    transform:
+      translate3d(var(--sanemi-x), -50%, 0) rotate(-3deg);
+  }
+
+  50% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 5px),
+        calc(-50% - 10px),
+        0) rotate(3deg);
+  }
+
+  100% {
+    transform:
+      translate3d(calc(var(--sanemi-x) + 4px),
+        calc(-50% - 3px),
+        0) rotate(-2deg);
+  }
+}
+
+
+@keyframes sanemi-lunge {
+
+  /* 一瞬だけ後ろへ力をためる */
+  0% {
+    transform:
+      translate3d(calc(var(--sanemi-x) + 8px),
+        -50%,
+        0) rotate(5deg);
+  }
+
+  /* 狙った位置より少し先まで踏み込む */
+  65% {
+    transform:
+      translate3d(calc(var(--sanemi-charge-x) - 18px),
+        calc(-50% - 5px),
+        0) rotate(-13deg);
+  }
+
+  /* 義勇がいた位置を走り抜ける */
+  100% {
+    transform:
+      translate3d(var(--sanemi-charge-x),
+        calc(-50% + 4px),
+        0) rotate(8deg);
+  }
+}
+
+@keyframes sanemi-stumble {
+  0% {
+    transform:
+      translate3d(var(--sanemi-charge-x),
+        calc(-50% + 4px),
+        0) rotate(8deg);
+  }
+
+  40% {
+    transform:
+      translate3d(calc(var(--sanemi-x) + 13px),
+        calc(-50% - 7px),
+        0) rotate(-8deg);
+  }
+
+  70% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 6px),
+        -50%,
+        0) rotate(4deg);
+  }
+
+  100% {
+    transform:
+      translate3d(var(--sanemi-x), -50%, 0) rotate(0deg);
+  }
+}
+
+@keyframes sanemi-rage-body {
+  0% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 8px),
+        calc(-50% - 5px),
+        0) rotate(-8deg) scale(1.04);
+  }
+
+  50% {
+    transform:
+      translate3d(calc(var(--sanemi-x) + 8px),
+        calc(-50% + 3px),
+        0) rotate(8deg) scale(.98);
+  }
+
+  100% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 6px),
+        calc(-50% - 8px),
+        0) rotate(-6deg) scale(1.05);
+  }
+}
+
+@keyframes sanemi-rage-face {
+  0% {
+    transform: translate(-5px, -4px) rotate(-7deg);
+  }
+
+  50% {
+    transform: translate(6px, 3px) rotate(8deg);
+  }
+
+  100% {
+    transform: translate(-4px, 5px) rotate(-5deg);
+  }
+}
+
+/*
+ * おはぎKISSのfuriousを移植。
+ * 親の上下動と同時に動くため、常に激しい怒りになる。
+ */
+@keyframes sanemi-furious {
+
+  0%,
+  100% {
+    transform: translate(-5px, -2px) rotate(-7deg);
+  }
+
+  25% {
+    transform: translate(5px, -7px) rotate(7deg);
+  }
+
+  50% {
+    transform: translate(-5px, -4px) rotate(-7deg);
+  }
+
+  75% {
+    transform: translate(5px, -10px) rotate(7deg);
+  }
+}
+
+.sweat-drop {
+  position: absolute;
+  z-index: 12;
+  font-size: 28px;
+  line-height: 1;
+  pointer-events: none;
+
+  animation: sweat-fly .72s cubic-bezier(.18, .7, .35, 1) forwards;
+}
+
+@keyframes sweat-fly {
+  0% {
+    opacity: 0;
+    transform:
+      translate(0, 0) rotate(0deg) scale(.3);
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+    transform:
+      translate(var(--sweat-x),
+        var(--sweat-y)) rotate(var(--sweat-rotate)) scale(1.2);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(var(--sweat-x),
+        calc(var(--sweat-y) + 35px)) rotate(var(--sweat-rotate)) scale(.85);
+  }
+}
+
+/*
+ * 💦などをゲーム画面全体へ飛ばすための透明な領域。
+ * 操作を邪魔しないようpointer-eventsは無効。
+ */
+#projectiles {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * 旧仕様のプレッシャー表示だけを隠す。
+ * 時計と残り時間ゲージは表示する。
+ */
+.pressure-ui {
+  display: none;
+}
+
+
+.scoreboard {
+  justify-content: center;
+}
+
+
+
+/*
+ * 実弥が空振りした時間だけ、
+ * おはぎを押しつけられることを明示する。
+ */
+#stage.cooldown {
+  background-color: #fff3bd;
+}
+
+#stage.cooldown::after {
+  content: "今だ！ 長押し！";
+
+  position: absolute;
+  top: 86px;
+  left: 50%;
+  z-index: 15;
+
+  padding: 5px 14px;
+  border-radius: 30px;
+
+  color: white;
+  background: #e29a22;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  transform: translateX(-50%);
+  animation: chance-pop .3s ease-out both;
+
+  pointer-events: none;
+}
+
+@keyframes chance-pop {
+  0% {
+    opacity: 0;
+    transform:
+      translateX(-50%) scale(.3);
+  }
+
+  70% {
+    transform:
+      translateX(-50%) scale(1.18);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translateX(-50%) scale(1);
+  }
+}
+
+
+/* ==================================================
+   レトロな竹林背景
+   ゲームのキャラクターとは別レイヤーで描画する
+   ================================================== */
+
+.bamboo-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 明るい砂地。模様を規則的に並べない */
+.bamboo-bg::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 36%;
+  z-index: 0;
+
+  border-top: 5px solid #718442;
+
+  /*
+   * 数個の小石だけを置く。
+   * repeatingを使わないので畑やネットに見えない。
+   */
+  background:
+    radial-gradient(ellipse at 14% 72%,
+      #c79c5a 0 7px,
+      transparent 8px),
+    radial-gradient(ellipse at 39% 42%,
+      #d3aa65 0 5px,
+      transparent 6px),
+    radial-gradient(ellipse at 67% 76%,
+      #c79c5a 0 8px,
+      transparent 9px),
+    radial-gradient(ellipse at 88% 35%,
+      #d3aa65 0 4px,
+      transparent 5px),
+    #edcf89;
+
+  /* 地面の入口だけ少し濃くして奥行きを出す */
+  box-shadow:
+    inset 0 7px 0 #c99c58,
+    inset 0 12px 0 #f4dfa1;
+}
+
+/*
+ * 節のある竹。
+ * 繰り返し模様は竹の内側だけなので、
+ * 画面全体が格子状にはならない。
+ */
+.bamboo {
+  position: absolute;
+  bottom: 31%;
+  width: 27px;
+  height: 76%;
+  z-index: 1;
+
+  border: 3px solid #35572d;
+  border-radius: 4px 4px 0 0;
+
+  background:
+    repeating-linear-gradient(to bottom,
+      #547f3d 0 4px,
+      #83aa50 4px 36px,
+      #3f6733 36px 42px);
+
+  box-shadow:
+    inset -6px 0 #668f43,
+    4px 3px 0 rgba(48, 70, 35, 0.22);
+
+  transform-origin: bottom center;
+}
+
+/* 竹の葉を少数だけつける */
+.bamboo::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: -25px;
+
+  width: 32px;
+  height: 13px;
+
+  border-radius: 100% 0;
+  background: #426d35;
+
+  transform: rotate(18deg);
+
+  box-shadow:
+    27px -19px 0 #365f31,
+    43px 5px 0 #527e3b,
+    4px 25px 0 #5e8941;
+}
+
+/* 中央はキャラクターのために空ける */
+.bamboo-1 {
+  left: 2%;
+  transform: rotate(-3deg);
+}
+
+.bamboo-2 {
+  left: 12%;
+  width: 21px;
+  height: 64%;
+  opacity: 0.72;
+  transform: rotate(2deg);
+}
+
+.bamboo-3 {
+  left: 22%;
+  width: 17px;
+  height: 55%;
+  opacity: 0.48;
+  transform: rotate(-2deg);
+}
+
+.bamboo-4 {
+  right: 22%;
+  width: 17px;
+  height: 55%;
+  opacity: 0.48;
+  transform: rotate(2deg);
+}
+
+.bamboo-5 {
+  right: 12%;
+  width: 21px;
+  height: 64%;
+  opacity: 0.72;
+  transform: rotate(-2deg);
+}
+
+.bamboo-6 {
+  right: 2%;
+  transform: rotate(3deg);
+}
+
+/* キャラクターを背景より手前に置く */
+#giyu,
+#sanemi {
+  z-index: 3;
+}
+
+
+/* =========================================
+   おはぎを食べたあとの喜び演出
+   actor本体ではなく画像だけを動かすため、
+   キャラクターのゲーム座標には影響しない。
+   ========================================= */
+
+/* 実弥は左右へ弾みながらスキップ */
+#stage.success #sanemiImage {
+  animation:
+    sanemi-happy-skip 1.05s cubic-bezier(.25, .8, .35, 1) both;
+}
+
+/* 義勇は控えめに嬉しそうに跳ねる */
+#stage.success #giyuImage {
+  animation:
+    giyu-happy-bounce 1.05s ease-in-out both;
+}
+
+/* 成功時の音符・ハートを大きく明るく表示 */
+#stage.success #effect {
+  color: #ff4f88;
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 6px;
+
+  -webkit-text-stroke: 1px #9d365e;
+
+  text-shadow:
+    0 3px 0 white,
+    0 0 8px #ffe45c,
+    0 0 18px #ff72a5;
+
+  animation:
+    happy-effect 0.7s ease-out both;
+}
+
+@keyframes sanemi-happy-skip {
+  0% {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  18% {
+    transform: translate(-9px, -22px) rotate(-7deg);
+  }
+
+  36% {
+    transform: translate(7px, 0) rotate(5deg);
+  }
+
+  55% {
+    transform: translate(-6px, -17px) rotate(-5deg);
+  }
+
+  74% {
+    transform: translate(8px, 0) rotate(5deg);
+  }
+
+  88% {
+    transform: translate(3px, -8px) rotate(-2deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+}
+
+@keyframes giyu-happy-bounce {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  35% {
+    transform: translateY(-12px) rotate(-3deg);
+  }
+
+  58% {
+    transform: translateY(0) rotate(2deg);
+  }
+
+  78% {
+    transform: translateY(-6px) rotate(-1deg);
+  }
+}
+
+@keyframes happy-effect {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -20%) scale(0.35) rotate(-8deg);
+  }
+
+  30% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%) scale(1.35) rotate(5deg);
+  }
+
+  65% {
+    opacity: 1;
+    transform:
+      translate(-50%, -80%) scale(1.1) rotate(-3deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(-50%, -125%) scale(1.45) rotate(6deg);
+  }
+}
+
+
+/* =========================================
+   実弥の攻撃で画面全体に発生する竜巻
+   ========================================= */
+
+#windEffect {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * 画面全体を覆う薄い渦。
+ * 実弥と義勇が見えなくならない透明度にする。
+ */
+#windEffect::before {
+  content: "";
+  position: absolute;
+
+  left: -10%;
+  top: -35%;
+
+  width: 120%;
+  height: 165%;
+
+  opacity: 0;
+  border-radius: 50%;
+
+  background:
+    repeating-radial-gradient(ellipse at 58% 52%,
+      transparent 0 18px,
+      rgba(238, 255, 230, 0.58) 20px 25px,
+      transparent 27px 43px);
+
+  filter:
+    blur(0.6px) drop-shadow(0 5px 0 rgba(48, 100, 69, 0.2));
+}
+
+/* 竜巻を構成する3段の回転リング */
+.wind-line {
+  position: absolute;
+
+  left: 5%;
+  top: 9%;
+
+  width: 90%;
+  height: 76%;
+
+  opacity: 0;
+
+  border:
+    11px solid rgba(255, 255, 245, 0.94);
+  border-right-color: transparent;
+  border-left-color: transparent;
+
+  filter:
+    drop-shadow(0 5px 0 rgba(45, 105, 64, 0.55)) drop-shadow(0 0 9px rgba(230, 255, 215, 0.95));
+}
+
+.wind-line:nth-child(2) {
+  left: 15%;
+  top: 27%;
+
+  width: 70%;
+  height: 55%;
+
+  border-width: 7px;
+}
+
+.wind-line:nth-child(3) {
+  left: 28%;
+  top: 46%;
+
+  width: 44%;
+  height: 36%;
+
+  border-width: 6px;
+}
+
+/* 攻撃中だけ竜巻を出現させる */
+#stage.attacking #windEffect::before {
+  animation:
+    tornado-body 0.24s ease-out both;
+}
+
+/* 攻撃中はステージ全体も風で白緑色に光らせる */
+#stage.attacking #windEffect {
+  background:
+    radial-gradient(ellipse at 65% 52%,
+      rgba(245, 255, 230, 0.52),
+      rgba(130, 190, 125, 0.28) 42%,
+      transparent 76%);
+
+  box-shadow:
+    inset 0 0 38px rgba(230, 255, 215, 0.85);
+}
+
+#stage.attacking .wind-line {
+  animation:
+    tornado-ring 0.24s linear both;
+}
+
+#stage.attacking .wind-line:nth-child(2) {
+  animation-delay: 0.015s;
+}
+
+#stage.attacking .wind-line:nth-child(3) {
+  animation-delay: 0.03s;
+}
+
+/* 渦全体が実弥の攻撃方向へ膨らむ */
+@keyframes tornado-body {
+  0% {
+    opacity: 0;
+    transform:
+      translateX(18%) rotate(-18deg) scale(0.45);
+  }
+
+  35% {
+    opacity: 0.72;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translateX(-14%) rotate(28deg) scale(1.25);
+  }
+}
+
+/* 3本のリングを高速回転させる */
+@keyframes tornado-ring {
+  0% {
+    opacity: 0;
+    transform:
+      rotate(0deg) scale(0.3);
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      rotate(540deg) scale(1.65);
+  }
+}
+
+
+
+35% {
+  opacity: 0.7;
+}
+
+100% {
+  opacity: 0;
+  transform:
+    translateX(42%) scaleX(1.2) rotate(-7deg);
+}
+
+
+/*
+ * ハートをゲーム画面だけでなく、
+ * ブラウザ画面全体へ漂わせる。
+ */
+#projectiles {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* KISSと同じハート本体の見た目 */
+.flying-heart {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  line-height: 1;
+  font-weight: 900;
+
+  text-shadow:
+    0 2px 0 white,
+    0 0 8px white,
+    0 0 18px currentColor;
+
+  filter:
+    drop-shadow(0 0 4px currentColor);
+  will-change:
+    transform,
+    opacity;
+}
+
+/* 実弥の周囲から飛び出す輪郭ハート */
+.happy-heart {
+  position: absolute;
+  left: 72%;
+  top: 66%;
+
+  color: #ff5f9b;
+  font-size: var(--heart-size);
+  font-weight: 900;
+  line-height: 1;
+
+  opacity: 0;
+
+  text-shadow:
+    1px 1px 0 white,
+    -1px -1px 0 white,
+    0 0 7px #ffaad0;
+
+  animation:
+    happy-heart-fly 0.9s var(--heart-delay) cubic-bezier(.15, .75, .3, 1) both;
+}
+
+.happy-heart:nth-child(3n) {
+  color: #ff91bd;
+}
+
+.happy-heart:nth-child(4n) {
+  color: #e3a539;
+}
+
+@keyframes happy-heart-fly {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%) scale(0.2) rotate(0);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--heart-x)),
+        calc(-50% + var(--heart-y))) scale(1.15) rotate(var(--heart-r));
+  }
+}
+
+/* 攻撃直前まで徐々に赤く、発光も強くする */
+@keyframes sanemi-red-charge {
+  0% {
+    filter: none;
+  }
+
+  35% {
+    filter:
+      sepia(0.12) saturate(1.5) hue-rotate(335deg) drop-shadow(0 0 4px #ff7b4a);
+  }
+
+  70% {
+    filter:
+      sepia(0.3) saturate(2.3) hue-rotate(325deg) drop-shadow(0 0 8px #ff473b);
+  }
+
+  100% {
+    filter:
+      sepia(0.45) saturate(3.4) hue-rotate(315deg) brightness(0.96) drop-shadow(0 0 9px #ff3028) drop-shadow(0 0 18px #ff9c32);
+  }
+}
+
+/* 攻撃を出す瞬間も最大怒りを維持 */
+#stage.attacking #sanemiImage {
+  filter:
+    sepia(0.45) saturate(3.4) hue-rotate(315deg) brightness(0.96) drop-shadow(0 0 10px #ff3028) drop-shadow(0 0 21px #ff9c32);
+}
+
+/* =========================================
+   隙ではないときのおはぎガード
+   ========================================= */
+
+/* 実弥が一歩踏み込んで押し返す */
+#stage.guard #sanemi {
+  z-index: 7;
+
+  animation:
+    sanemi-guard 0.32s cubic-bezier(.2, .85, .3, 1) both;
+}
+
+/* 義勇がおはぎごと弾き返される */
+#stage.guard #giyu {
+  animation:
+    giyu-repel 0.32s ease-out both;
+}
+
+@keyframes sanemi-guard {
+  0% {
+    transform:
+      translate3d(var(--sanemi-x),
+        -50%,
+        0) rotate(0);
+  }
+
+  42% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 34px),
+        calc(-50% - 4px),
+        0) rotate(-10deg) scale(1.08);
+  }
+
+  100% {
+    transform:
+      translate3d(var(--sanemi-x),
+        -50%,
+        0) rotate(0);
+  }
+}
+
+@keyframes giyu-repel {
+  0% {
+    transform:
+      translate3d(0, -50%, 0) rotate(0);
+  }
+
+  35% {
+    transform:
+      translate3d(-22px, calc(-50% - 10px), 0) rotate(-10deg);
+  }
+
+  100% {
+    transform:
+      translate3d(-90px, -50%, 0) rotate(-17deg);
+  }
+}
+
+/* おはぎ成功時はステージ全体も明るく祝福する */
+#stage.success {
+  animation:
+    happy-stage-flash 1.05s ease-out both;
+}
+
+@keyframes happy-stage-flash {
+  0% {
+    box-shadow:
+      inset 0 0 0 transparent;
+  }
+
+  22% {
+    box-shadow:
+      inset 0 0 55px rgba(255, 117, 175, 0.75);
+  }
+
+  48% {
+    box-shadow:
+      inset 0 0 70px rgba(255, 226, 91, 0.72);
+  }
+
+  100% {
+    box-shadow:
+      inset 0 0 0 transparent;
+  }
+}
+
+/* =========================================
+   反撃が近づくほど増える怒りマーク
+   ========================================= */
+
+#warning::before,
+#warning::after {
+  content: "💢";
+  position: absolute;
+  z-index: 2;
+
+  opacity: 0;
+
+  filter:
+    drop-shadow(0 2px 0 white);
+}
+
+/* 2個目は実弥の左上へ出現 */
+#warning::before {
+  top: -18px;
+  left: -42px;
+  font-size: 27px;
+}
+
+/* 3個目は実弥の右側へ出現 */
+#warning::after {
+  top: 23px;
+  right: -48px;
+  font-size: 32px;
+}
+
+/* 予兆の前半で2個目を追加 */
+#stage.warning #warning::before {
+  animation:
+    rage-mark-second 0.9s ease-out both;
+}
+
+/* 予兆の後半で3個目を追加 */
+#stage.warning #warning::after {
+  animation:
+    rage-mark-third 0.9s ease-out both;
+}
+
+@keyframes rage-mark-second {
+
+  0%,
+  24% {
+    opacity: 0;
+    transform:
+      scale(0.2) rotate(-20deg);
+  }
+
+  36%,
+  100% {
+    opacity: 1;
+    transform:
+      scale(1) rotate(5deg);
+  }
+}
+
+@keyframes rage-mark-third {
+
+  0%,
+  57% {
+    opacity: 0;
+    transform:
+      scale(0.2) rotate(20deg);
+  }
+
+  70% {
+    opacity: 1;
+    transform:
+      scale(1.35) rotate(-8deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      scale(1.1) rotate(4deg);
+  }
+}
+
+
+/* =========================================
+   長押し中の義勇の突進
+   ========================================= */
+
+/*
+ * 通常時の上下運動を止め、
+ * 小さく素早い踏み込みへ変更する。
+ */
+#stage.pressing #giyu {
+  animation:
+    giyu-charge-step 0.16s steps(2, end) infinite;
+}
+
+/* 義勇の後方へ逆向きの風を表示 */
+#stage.pressing #giyu::before {
+  content: "💨";
+
+  position: absolute;
+  left: -38px;
+  top: 54%;
+  z-index: -1;
+
+  font-size: 30px;
+  line-height: 1;
+
+  pointer-events: none;
+
+  /*
+   * 絵文字を左右反転し、
+   * 義勇が右へ進む勢いを表す。
+   */
+  transform:
+    translateY(-50%) scaleX(-1);
+
+  transform-origin: center;
+
+  animation:
+    giyu-wind-puff 0.36s ease-out infinite;
+}
+
+@keyframes giyu-charge-step {
+
+  0%,
+  100% {
+    transform:
+      translate3d(0, -50%, 0) rotate(-6deg) scale(1.03, 0.97);
+  }
+
+  50% {
+    transform:
+      translate3d(5px,
+        calc(-50% - 4px),
+        0) rotate(-4deg) scale(0.98, 1.04);
+  }
+}
+
+@keyframes giyu-wind-puff {
+  0% {
+    opacity: 0;
+    transform:
+      translate(18px, -50%) scaleX(-1) scale(0.45);
+  }
+
+  35% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(-18px, -50%) scaleX(-1) scale(1.15);
+  }
+}
+
+
+/* =========================================
+   ハッピーモードの光の輪
+   ========================================= */
+
+#stage.success::before {
+  content: "";
+
+  position: absolute;
+  left: 72%;
+  top: 58%;
+  z-index: 4;
+
+  width: 150px;
+  height: 150px;
+
+  border:
+    9px solid rgba(255, 216, 77, 0.85);
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 8px rgba(255, 255, 255, 0.65),
+    0 0 24px #ffef8a,
+    inset 0 0 20px #ff8fbd;
+
+  pointer-events: none;
+
+  animation:
+    happy-burst-ring 1.05s ease-out both;
+}
+
+/* 2人も白・金色に発光させる */
+#stage.success #giyuImage,
+#stage.success #sanemiImage {
+  filter:
+    drop-shadow(0 0 6px white) drop-shadow(0 0 13px #ffd84d) drop-shadow(0 0 18px #ff80b5);
+}
+
+@keyframes happy-burst-ring {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%) scale(0.15);
+  }
+
+  24% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%) scale(2.4);
+  }
+}
+
+
+/*
+ * 実弥は怒りが高まるほど少しずつ巨大化。
+ * 足元を基準に拡大するので、地面から浮いて見えにくい。
+ */
+#sanemiImage {
+  transform-origin: 50% 100%;
+  scale: 1;
+  transition: scale .18s ease-out;
+}
+
+/* 予兆の約0.9秒を使って、じわじわ大きくなる */
+#stage.warning #sanemiImage {
+  scale: 1.1;
+  transition-duration: .9s;
+  transition-timing-function: ease-in;
+}
+
+/* 攻撃の瞬間だけ、さらに一段大きくする */
+#stage.attacking #sanemiImage {
+  scale: 1.16;
+  transition-duration: .08s;
+}
+
+/* =========================================
+   全画面タイムアップ演出
+   ========================================= */
+
+#timeUpOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  display: grid;
+  place-content: center;
+  gap: 8px;
+
+  text-align: center;
+  color: white;
+
+  background:
+    radial-gradient(circle,
+      rgba(238, 76, 73, .78),
+      rgba(83, 28, 25, .92));
+
+  animation:
+    time-up-pop .7s cubic-bezier(.18, 1.35, .3, 1) both;
+}
+
+#timeUpOverlay strong {
+  display: block;
+
+  font-size: clamp(58px, 15vw, 150px);
+  line-height: .9;
+  letter-spacing: .04em;
+
+  color: #fff4bd;
+
+  text-shadow:
+    0 5px 0 #a9272d,
+    0 10px 0 #641c24,
+    0 0 24px #ffdf65;
+}
+
+#timeUpOverlay span {
+  font-size: clamp(22px, 5vw, 42px);
+  font-weight: 900;
+
+  text-shadow:
+    0 3px 0 #641c24,
+    0 0 12px #ffdf65;
+}
+
+#timeUpOverlay.leaving {
+  animation:
+    time-up-leave .4s ease-in both;
+}
+
+@keyframes time-up-pop {
+  0% {
+    opacity: 0;
+    transform: scale(2.8) rotate(-8deg);
+  }
+
+  45% {
+    opacity: 1;
+    transform: scale(.85) rotate(3deg);
+  }
+
+  68% {
+    transform: scale(1.12) rotate(-1deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes time-up-leave {
+  to {
+    opacity: 0;
+    transform: scale(.65);
+  }
+}
+
+
+/* =========================================
+   通常待機中のイライラ
+   ========================================= */
+
+#stage:not(.warning):not(.attacking):not(.cooldown):not(.success):not(.hit):not(.guard) #sanemi::after {
+  content: "💢";
+
+  position: absolute;
+  right: 0;
+  top: 10px;
+  z-index: 8;
+
+  font-size: 24px;
+  pointer-events: none;
+
+  opacity: 0;
+  filter:
+    saturate(1.15) drop-shadow(0 1px 2px white);
+
+  animation:
+    sanemi-small-irritation 1.35s ease-in-out infinite;
+}
+
+@keyframes sanemi-small-irritation {
+
+  0%,
+  18% {
+    opacity: 0;
+    transform:
+      translateY(5px) scale(.65) rotate(-8deg);
+  }
+
+  35% {
+    opacity: .8;
+    transform:
+      translateY(0) scale(1) rotate(5deg);
+  }
+
+  68% {
+    opacity: .7;
+    transform:
+      translateY(-9px) scale(1.08) rotate(-4deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translateY(-20px) scale(.85) rotate(6deg);
+  }
+}
+
+
+
+/* 小さく現れ、少し浮いて消える */
+@keyframes sanemi-small-irritation {
+
+  0%,
+  35% {
+    opacity: 0;
+    transform:
+      translateY(4px) scale(.6) rotate(-8deg);
+  }
+
+  50% {
+    opacity: .42;
+    transform:
+      translateY(0) scale(.9) rotate(4deg);
+  }
+
+  70% {
+    opacity: .32;
+    transform:
+      translateY(-7px) scale(1) rotate(-3deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translateY(-14px) scale(.8) rotate(5deg);
+  }
+}
+
+
+/* =========================================
+   タイミング評価・コンボ・フェイント
+   ========================================= */
+
+.scoreboard {
+  flex-wrap: wrap;
+}
+
+#comboPanel {
+  min-width: 72px;
+  opacity: .38;
+  transform: scale(.9);
+  transition:
+    opacity .16s ease,
+    transform .16s ease;
+}
+
+#comboPanel.active {
+  opacity: 1;
+  color: #b3263c;
+  transform: scale(1.08);
+  animation: combo-pulse .34s ease-in-out infinite alternate;
+}
+
+#comboPanel strong {
+  color: #d02647;
+}
+
+/* フェイント中は実弥が攻撃すると見せかけて跳ね戻る */
+#stage.feint #sanemi {
+  animation:
+    sanemi-feint .52s cubic-bezier(.2, .8, .3, 1) both;
+}
+
+#stage.feint::after {
+  content: "フェイント！\A離すな！";
+  white-space: pre;
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  z-index: 20;
+  padding: 6px 14px;
+  border: 3px solid #56392f;
+  border-radius: 8px;
+  color: #56392f;
+  background: #fff4a9;
+  font-weight: 900;
+  text-align: center;
+  transform: translateX(-50%) rotate(-3deg);
+  animation: feint-pop .22s ease-out both;
+}
+
+/* 最後の0.18秒は金色に光らせ、PERFECTの瞬間を知らせる */
+#stage.perfect-window {
+  box-shadow:
+    inset 0 0 0 5px #ffd84d,
+    inset 0 0 35px #fff3a8;
+}
+
+#stage.rank-just.dodging #giyu {
+  animation:
+    just-dodge .48s cubic-bezier(.18, .85, .3, 1) both;
+}
+
+#stage.rank-perfect.dodging #giyu {
+  z-index: 12;
+  animation:
+    perfect-dodge .58s cubic-bezier(.18, .85, .3, 1) both;
+}
+
+/* PERFECT後は実弥も大きく転ぶ */
+#stage.rank-perfect.cooldown #sanemi {
+  animation:
+    sanemi-perfect-crash .72s cubic-bezier(.2, .75, .28, 1) both;
+}
+
+@keyframes sanemi-feint {
+  0% {
+    transform:
+      translate3d(var(--sanemi-x), -50%, 0) rotate(0);
+  }
+
+  38% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 42px),
+        calc(-50% - 25px), 0) rotate(-10deg) scale(1.08);
+  }
+
+  100% {
+    transform:
+      translate3d(var(--sanemi-x), -50%, 0) rotate(3deg);
+  }
+}
+
+@keyframes just-dodge {
+  0% {
+    transform: translate3d(0, -50%, 0);
+  }
+
+  48% {
+    transform:
+      translate3d(-48px, calc(-50% - 32px), 0) rotate(-12deg);
+  }
+
+  100% {
+    transform:
+      translate3d(-62px, -50%, 0) rotate(-5deg);
+  }
+}
+
+@keyframes perfect-dodge {
+  0% {
+    transform:
+      translate3d(0, -50%, 0) rotate(0) scale(1);
+  }
+
+  42% {
+    transform:
+      translate3d(-65px, calc(-50% - 92px), 0) rotate(-24deg) scale(1.08);
+  }
+
+  100% {
+    transform:
+      translate3d(-90px, -50%, 0) rotate(-8deg) scale(1);
+  }
+}
+
+@keyframes sanemi-perfect-crash {
+  0% {
+    transform:
+      translate3d(var(--sanemi-charge-x),
+        calc(-50% + 4px), 0) rotate(8deg);
+  }
+
+  48% {
+    transform:
+      translate3d(calc(var(--sanemi-x) - 18px),
+        calc(-50% + 20px), 0) rotate(-34deg) scale(1.08);
+  }
+
+  100% {
+    transform:
+      translate3d(var(--sanemi-x), -50%, 0) rotate(0);
+  }
+}
+
+@keyframes combo-pulse {
+  to {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes feint-pop {
+  from {
+    opacity: 0;
+    transform:
+      translateX(-50%) translateY(18px) scale(.55);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================
+   レトロ格ゲー風フィードバック
+   ========================================= */
+
+/* 黄色い説明カードを廃止して、斜めの必殺表示へ */
+#stage.feint::after {
+  content: "フェイント！\A HOLD!";
+  white-space: pre;
+
+  position: absolute;
+  left: 50%;
+  top: 17%;
+  z-index: 30;
+
+  width: max-content;
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+
+  color: #fff;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(25px, 6vw, 45px);
+  font-weight: 900;
+  font-style: italic;
+  line-height: .86;
+  letter-spacing: .04em;
+  text-align: center;
+
+  text-shadow:
+    3px 3px 0 #1f1715,
+    -2px -2px 0 #1f1715,
+    5px 5px 0 #ce2c32,
+    0 0 12px #fff;
+
+  transform:
+    translateX(-50%) rotate(-8deg) skewX(-9deg);
+
+  animation:
+    arcade-feint .52s steps(2, end) both;
+}
+
+/* フェイント中の集中線 */
+#stage.feint::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  z-index: 19;
+  pointer-events: none;
+
+  background:
+    repeating-conic-gradient(from 252deg at 72% 68%,
+      transparent 0deg 5deg,
+      rgba(75, 29, 23, .34) 5.5deg 6.5deg,
+      transparent 7deg 12deg);
+
+  animation:
+    arcade-lines .52s ease-out both;
+}
+
+/* 回避評価をステージ中央へ大きく表示 */
+#stage.rank-nice::after,
+#stage.rank-just::after,
+#stage.rank-perfect::after {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  z-index: 35;
+
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(38px, 10vw, 72px);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+
+  transform:
+    translateX(-50%) rotate(-7deg) skewX(-10deg);
+
+  pointer-events: none;
+
+  animation:
+    arcade-rank-pop .72s cubic-bezier(.16, .85, .28, 1) both;
+}
+
+#stage.rank-nice::after {
+  content: "回避！";
+  color: #66d9ff;
+  text-shadow:
+    3px 3px 0 #12394d,
+    -2px -2px 0 white,
+    0 0 15px #69dfff;
+}
+
+#stage.rank-just::after {
+  content: "JUST!";
+  color: #ff8b38;
+  text-shadow:
+    3px 3px 0 #662713,
+    -2px -2px 0 white,
+    0 0 17px #ffc14f;
+}
+
+#stage.rank-perfect::after {
+  content: "PERFECT!!";
+  color: #ffe14d;
+  text-shadow:
+    3px 3px 0 #7d3217,
+    -3px -3px 0 white,
+    6px 6px 0 #db3342,
+    0 0 22px #fff4a6;
+}
+
+/* PERFECTは画面にも衝撃を出す */
+#stage.rank-perfect {
+  animation:
+    arcade-perfect-impact .36s steps(2, end) both;
+}
+
+/* コンボを角丸カードからアーケード表示へ */
+#comboPanel,
+#comboPanel.active {
+  padding: 3px 10px;
+
+  border: 3px solid #35211d;
+  border-radius: 2px;
+
+  color: white;
+  background:
+    linear-gradient(135deg,
+      #291b19 0 70%,
+      #b82038 71% 100%);
+
+  box-shadow:
+    3px 3px 0 #d5a84c;
+
+  transform:
+    skewX(-8deg);
+}
+
+#comboPanel strong {
+  color: #ffe052;
+  text-shadow:
+    2px 2px 0 #971e2e;
+}
+
+#comboPanel.active {
+  opacity: 1;
+  animation:
+    arcade-combo .3s steps(2, end) infinite alternate;
+}
+
+/* 成功時の加点を上へ弾く */
+#stage.success #burst {
+  color: #ffe052;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(25px, 7vw, 48px);
+  font-style: italic;
+
+  text-shadow:
+    3px 3px 0 #6f241c,
+    -2px -2px 0 white,
+    0 0 17px #ff9b57;
+
+  animation:
+    arcade-score-up .9s cubic-bezier(.15, .8, .25, 1) both;
+}
+
+@keyframes arcade-feint {
+  0% {
+    opacity: 0;
+    scale: 2.4;
+  }
+
+  22% {
+    opacity: 1;
+    scale: .82;
+  }
+
+  42% {
+    scale: 1.18;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1;
+  }
+}
+
+@keyframes arcade-lines {
+  from {
+    opacity: 0;
+    scale: .4;
+    rotate: -8deg;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    scale: 1.1;
+    rotate: 3deg;
+  }
+}
+
+@keyframes arcade-rank-pop {
+  0% {
+    opacity: 0;
+    scale: 2.8;
+  }
+
+  20% {
+    opacity: 1;
+    scale: .72;
+  }
+
+  42% {
+    scale: 1.17;
+  }
+
+  72% {
+    opacity: 1;
+    scale: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.28;
+  }
+}
+
+@keyframes arcade-perfect-impact {
+
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  25% {
+    translate: -7px 3px;
+    filter: brightness(1.35);
+  }
+
+  50% {
+    translate: 7px -3px;
+  }
+
+  75% {
+    translate: -4px -2px;
+  }
+}
+
+@keyframes arcade-combo {
+  to {
+    filter:
+      brightness(1.25) drop-shadow(0 0 6px #ffcf4d);
+    transform:
+      skewX(-8deg) scale(1.08);
+  }
+}
+
+@keyframes arcade-score-up {
+  0% {
+    opacity: 0;
+    scale: .4;
+    translate: 0 35px;
+  }
+
+  28% {
+    opacity: 1;
+    scale: 1.2;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: .92;
+    translate: 0 -75px;
+  }
+}
+
+
+/* =========================================
+   れんぞく表示
+   画面全体の茶色・生成り・桃色に統一する
+   ========================================= */
+
+#comboPanel {
+  min-width: 82px;
+  padding: 6px 11px;
+
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+
+  color: #fff8e8;
+  background:
+    linear-gradient(145deg,
+      #8b5942,
+      #68402f);
+
+  border: 2px solid #e8b58e;
+  border-radius: 999px;
+
+  box-shadow:
+    0 3px 0 #4b2b20,
+    inset 0 1px 0 #ffffff44;
+
+  clip-path: none;
+  transform: none;
+  opacity: 0.62;
+}
+
+/* 以前の斜め札の飾りを無効化 */
+#comboPanel::before,
+#comboPanel::after {
+  content: none !important;
+}
+
+#comboPanel strong {
+  color: #ffd36b;
+  font-size: 24px;
+  line-height: 1;
+
+  text-shadow:
+    0 2px 0 #573024;
+}
+
+#comboPanel span {
+  color: #ffe9d2;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+#comboPanel.active {
+  opacity: 1;
+
+  background:
+    linear-gradient(145deg,
+      #a44c3d,
+      #713528);
+
+  border-color: #ffc58e;
+
+  animation:
+    combo-kawaii-pop 0.32s cubic-bezier(.2, 1.45, .4, 1);
+}
+
+@keyframes combo-kawaii-pop {
+  0% {
+    transform: scale(0.82) rotate(-3deg);
+  }
+
+  65% {
+    transform: scale(1.1) rotate(2deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+
+/*
+ * 指を離したときの回避ジャンプ。
+ * 横移動はJavaScriptで行い、
+ * CSSでは上下の跳ね方を担当する。
+ */
+#stage.dodging #giyu {
+  animation:
+    giyu-hop-back .38s cubic-bezier(.22, .8, .3, 1) both;
+}
+
+@keyframes giyu-hop-back {
+  0% {
+    transform:
+      translate3d(var(--giyu-x), -50%, 0) rotate(0) scale(1);
+  }
+
+  /* 後ろへ大きく跳び上がる */
+  42% {
+    transform:
+      translate3d(calc(var(--giyu-x) - 15px),
+        calc(-50% - 62px),
+        0) rotate(-16deg) scale(1.08);
+  }
+
+  /* 着地時に少し潰して勢いを出す */
+  76% {
+    transform:
+      translate3d(calc(var(--giyu-x) - 3px),
+        calc(-50% + 7px),
+        0) rotate(5deg) scale(1.05, .93);
+  }
+
+  100% {
+    transform:
+      translate3d(var(--giyu-x), -50%, 0) rotate(0) scale(1);
+  }
+}
+
+/*
+ * 上下3レーンの移動。
+ * 横座標や回避ジャンプのtransformとは分けて、
+ * topだけを滑らかに変更する。
+ */
+#giyu {
+  transition:
+    top .16s cubic-bezier(.2, .85, .3, 1.2),
+    filter .12s;
+}
+
+
+/*
+ * 実弥は攻撃時、狙った上下レーンへ素早く移動する。
+ * 横方向の突進アニメーションとは別にtopを変化させる。
+ */
+#sanemi {
+  transition:
+    top .14s cubic-bezier(.15, .85, .25, 1);
+}
+
+/*
+ * ステージ上のスワイプを、
+ * スクロールではなくゲーム操作として使用する。
+ */
+#stage {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* =========================================
+   王道アクションゲーム風フォント
+   ========================================= */
+
+body,
+button {
+  font-family:
+    "Noto Sans JP",
+    sans-serif;
+}
+
+/* 太く見せたいゲーム情報 */
+header h1,
+#result,
+#burst,
+#effect,
+.scoreboard strong,
+#comboPanel,
+#action,
+#timeUpOverlay,
+.ending-kicker,
+.ending-score {
+  font-family:
+    "Dela Gothic One",
+    "Noto Sans JP",
+    sans-serif;
+}
+
+/* タイトルは少し前傾させて勢いを出す */
+header h1 {
+  letter-spacing: .02em;
+  transform: skewX(-4deg);
+}
+
+header h1 strong {
+  letter-spacing: .04em;
+
+  text-shadow:
+    2px 2px 0 #fff2d7,
+    4px 4px 0 #743527;
+}
+
+/* 判定文字も格ゲーらしく強くする */
+#burst {
+  font-style: italic;
+  letter-spacing: .04em;
+}
+
+/* 格ゲー風フォントは見出し・演出だけに限定 */
+body,
+button,
+header h1,
+#result,
+.message-box,
+.scoreboard,
+.scoreboard strong,
+#comboPanel,
+#action {
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+header h1 {
+  transform: none;
+  letter-spacing: 0;
+}
+
+header h1 strong,
+#burst,
+.time-up-flash strong,
+.ending-kicker {
+  font-family: "Dela Gothic One", "Noto Sans JP", sans-serif;
+}
+
+header h1 strong {
+  font-size: .86em;
+  letter-spacing: .01em;
+  text-shadow: 2px 2px 0 #fff2d7;
+}
+
+
+/* =========================================
+   フォントを読みやすい太ゴシックへ統一
+   ========================================= */
+
+html body,
+button,
+header,
+header h1,
+header h1 strong,
+.eyebrow,
+.toolbar,
+.scoreboard,
+.scoreboard strong,
+#comboPanel,
+#result,
+#message,
+#action,
+#burst,
+.hint,
+footer,
+.ending {
+  font-family: "Noto Sans JP", sans-serif !important;
+}
+
+body {
+  font-weight: 500;
+}
+
+header h1,
+header h1 strong,
+#result,
+#action,
+#burst,
+.scoreboard strong {
+  font-weight: 900;
+}
+
+header h1 {
+  transform: none;
+  letter-spacing: 0;
+}
+
+header h1 strong {
+  font-size: 1em;
+  letter-spacing: .02em;
+  text-shadow:
+    2px 2px 0 #fff0cf,
+    3px 3px 0 #7e3529;
+}
+
+/* 連続座標版の確定指定（旧試作指定より後に置く） */
+html body,
+body *,
+button {
+  font-family: "Zen Kaku Gothic New", "Yu Gothic", sans-serif !important;
+}
+
+header h1 {
+  transform: none;
+  letter-spacing: .015em;
+}
+
+header h1 strong {
+  font-size: 1.18em;
+  letter-spacing: .025em;
+  text-shadow: 0 2px 0 #fff, 0 4px 0 #7e3529;
+}
+
+#stage {
+  height: clamp(310px, 58vw, 360px);
+}
+
+#giyu,
+#sanemi {
+  transition: filter .12s !important;
+  will-change: left, top, transform;
+}
+
+/* 自由移動アクション版の最終上書き */
+#stage.free-motion {
+  height: clamp(330px, 62vw, 390px);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#stage.free-motion #giyu,
+#stage.free-motion #sanemi {
+  right: auto;
+  transition: filter .12s !important;
+}
+
+#stage.free-motion.attacking #sanemi {
+  animation: none !important;
+  z-index: 9;
+  filter:
+    drop-shadow(0 0 9px #ff3a2e) drop-shadow(0 0 18px #ffb13b);
+}
+
+#stage.free-motion.cooldown #sanemi {
+  animation: free-sanemi-stunned .34s ease-in-out infinite alternate !important;
+}
+
+#stage.free-motion:not(.hit):not(.success) #giyu {
+  animation: free-giyu-float .42s ease-in-out infinite alternate !important;
+}
+
+#points {
+  color: #c52e42;
+  font-size: 32px;
+}
+
+#score {
+  font-size: 22px;
+}
+
+.ending-score strong {
+  font-size: clamp(58px, 18vw, 82px);
+}
+
+.ending-score span {
+  display: block;
+  margin-top: 3px;
+  font-weight: 900;
+}
+
+/* =========================================
+   自由移動版：最終確定指定
+   旧レーン移動・旧突進アニメより必ず後で適用する。
+   ========================================= */
+
+#stage.free-motion {
+  height: clamp(330px, 62vw, 390px);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#stage.free-motion #giyu,
+#stage.free-motion #sanemi {
+  right: auto;
+  transition: filter .12s !important;
+}
+
+#stage.free-motion.attacking #sanemi {
+  animation: none !important;
+  z-index: 9;
+  filter:
+    drop-shadow(0 0 9px #ff3a2e) drop-shadow(0 0 18px #ffb13b);
+}
+
+#stage.free-motion.cooldown #sanemi {
+  animation: free-sanemi-stunned .34s ease-in-out infinite alternate !important;
+}
+
+#stage.free-motion:not(.hit):not(.success) #giyu {
+  animation: free-giyu-float .42s ease-in-out infinite alternate !important;
+}
+
+#points {
+  color: #c52e42;
+  font-size: 32px;
+}
+
+#score {
+  font-size: 22px;
+}
+
+.ending-score strong {
+  font-size: clamp(58px, 18vw, 82px);
+}
+
+.ending-score span {
+  display: block;
+  margin-top: 3px;
+  font-weight: 900;
+}
+
+/* =========================================
+   自由移動アクション版
+   ========================================= */
+
+#stage.free-motion {
+  cursor: crosshair;
+}
+
+/* 実弥の突進座標はJavaScriptで動かす。旧横突進アニメは重ねない。 */
+#stage.free-motion.attacking #sanemi {
+  animation: none !important;
+  z-index: 9;
+  filter:
+    drop-shadow(0 0 9px #ff3a2e) drop-shadow(0 0 17px #ffb13b);
+}
+
+/* 硬直中だけ、その場で分かりやすくふらつかせる。 */
+#stage.free-motion.cooldown #sanemi {
+  animation: free-sanemi-stunned .34s ease-in-out infinite alternate !important;
+}
+
+@keyframes free-sanemi-stunned {
+  from {
+    transform: translate3d(0, -50%, 0) rotate(-8deg) scale(.98);
+  }
+
+  to {
+    transform: translate3d(0, calc(-50% - 9px), 0) rotate(8deg) scale(1.04);
+  }
+}
+
+/* 自由移動中の義勇はわずかに浮かせ、座標変化を見やすくする。 */
+#stage.free-motion:not(.hit):not(.success) #giyu {
+  animation: free-giyu-float .42s ease-in-out infinite alternate;
+}
+
+@keyframes free-giyu-float {
+  from {
+    transform: translate3d(0, -50%, 0) rotate(-2deg);
+  }
+
+  to {
+    transform: translate3d(0, calc(-50% - 7px), 0) rotate(2deg);
+  }
+}
+
+/* 得点を主役、個数を補助情報として見せる。 */
+#points {
+  color: #c52e42;
+  font-size: 32px;
+}
+
+#score {
+  font-size: 22px;
+}
+
+.ending-score strong {
+  font-size: clamp(58px, 18vw, 82px);
+}
+
+.ending-score span {
+  display: block;
+  margin-top: 3px;
+  font-weight: 900;
+}
+
+/* =========================================
+   連続座標版：最終上書き
+   ========================================= */
+
+html body,
+body *,
+button {
+  font-family: "Zen Kaku Gothic New", "Yu Gothic", sans-serif !important;
+}
+
+body {
+  font-weight: 500;
+}
+
+header h1,
+header h1 strong,
+#result,
+#action,
+.scoreboard strong,
+#comboPanel,
+#burst {
+  font-weight: 900;
+}
+
+header h1 {
+  transform: none;
+  letter-spacing: .015em;
+}
+
+header h1 strong {
+  font-size: 1.18em;
+  letter-spacing: .025em;
+  text-shadow:
+    0 2px 0 #fff,
+    0 4px 0 #7e3529;
+}
+
+#stage {
+  height: clamp(310px, 58vw, 360px);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* topとleftはJavaScriptが毎フレーム補間する。CSS transitionは重ねない。 */
+#giyu,
+#sanemi {
+  transition: filter .12s !important;
+  will-change: left, top, transform;
+}
+
+/* 横座標はJavaScript、跳び上がりだけCSSで担当する。 */
+#stage.dodging #giyu {
+  animation: smooth-backstep-hop .38s cubic-bezier(.2, .85, .3, 1) both !important;
+}
+
+@keyframes smooth-backstep-hop {
+  0% {
+    transform: translate3d(0, -50%, 0) rotate(0) scale(1);
+  }
+
+  48% {
+    transform: translate3d(0, calc(-50% - 48px), 0) rotate(-14deg) scale(1.06);
+  }
+
+  78% {
+    transform: translate3d(0, calc(-50% + 5px), 0) rotate(4deg) scale(1.04, .94);
+  }
+
+  100% {
+    transform: translate3d(0, -50%, 0) rotate(0) scale(1);
+  }
+}
+
+.hint {
+  padding: 0 12px;
+  color: #6f4e3e;
+  font-weight: 700;
+}
+
+.hint[hidden] {
+  display: none;
+}
+
+#result {
+  letter-spacing: .02em;
+}
+
+#action {
+  letter-spacing: .03em;
+}
+
+/* 上下回避が目で分かる広さにする */
+#stage {
+  height: clamp(300px, 48vw, 340px);
+}
+
+#giyu,
+#sanemi {
+  transition:
+    top .18s cubic-bezier(.2, .85, .3, 1.15),
+    filter .12s;
+}
+
+
+/* フォントを元のゲーム全体で統一 */
+body,
+body * {
+  font-family: "Zen Maru Gothic", sans-serif !important;
+}
+
+header h1 {
+  transform: none;
+  letter-spacing: 0;
+}
+
+header h1 strong {
+  font-size: 1em;
+  letter-spacing: .02em;
+  text-shadow:
+    2px 2px 0 #fff0cf,
+    3px 3px 0 #7e3529;
+}
+
+/* 連続座標版の確定指定（旧試作指定より後に置く） */
+html body,
+body *,
+button {
+  font-family: "Zen Kaku Gothic New", "Yu Gothic", sans-serif !important;
+}
+
+header h1 {
+  transform: none;
+  letter-spacing: .015em;
+}
+
+header h1 strong {
+  font-size: 1.18em;
+  letter-spacing: .025em;
+  text-shadow: 0 2px 0 #fff, 0 4px 0 #7e3529;
+}
+
+#stage {
+  height: clamp(310px, 58vw, 360px);
+}
+
+#giyu,
+#sanemi {
+  transition: filter .12s !important;
+  will-change: left, top, transform;
+}
+
+/* 自由移動アクション版：ファイル末尾の確定指定 */
+#stage.free-motion {
+  height: clamp(330px, 62vw, 390px);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#stage.free-motion #giyu,
+#stage.free-motion #sanemi {
+  right: auto;
+  transition: filter .12s !important;
+}
+
+#stage.free-motion.attacking #sanemi {
+  animation: none !important;
+  z-index: 9;
+  filter:
+    drop-shadow(0 0 9px #ff3a2e) drop-shadow(0 0 18px #ffb13b);
+}
+
+#stage.free-motion.cooldown #sanemi {
+  animation: free-sanemi-stunned .34s ease-in-out infinite alternate !important;
+}
+
+#stage.free-motion:not(.hit):not(.success) #giyu {
+  animation: free-giyu-float .42s ease-in-out infinite alternate !important;
+}
+
+#points {
+  color: #c52e42;
+  font-size: 32px;
+}
+
+#score {
+  font-size: 22px;
+}
+
+.ending-score strong {
+  font-size: clamp(58px, 18vw, 82px);
+}
+
+.ending-score span {
+  display: block;
+  margin-top: 3px;
+  font-weight: 900;
+}
+
+/* 義勇が近づくほど、実弥の怒りを二段階で強く見せる。 */
+#stage.free-motion.proximity-rage #sanemi {
+  z-index: 8;
+  animation: sanemi-near-rage .13s steps(2, end) infinite !important;
+  filter:
+    drop-shadow(0 0 7px #ff5b3d) drop-shadow(0 0 13px #ffb13b);
+}
+
+#stage.free-motion.proximity-fury #sanemi {
+  animation-duration: .065s !important;
+  filter:
+    drop-shadow(0 0 10px #ff2828) drop-shadow(0 0 22px #ff8133);
+}
+
+#stage.free-motion.proximity-rage #sanemi::after {
+  content: "💢";
+  position: absolute;
+  left: 48%;
+  top: -17px;
+  z-index: 12;
+  font-size: 32px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 0 white);
+  animation: near-rage-mark .32s steps(2, end) infinite;
+}
+
+#stage.free-motion.proximity-fury #sanemi::after {
+  content: "💢 💢";
+  left: 23%;
+  top: -25px;
+  width: 110px;
+  font-size: 38px;
+  animation-duration: .16s;
+}
+
+@keyframes sanemi-near-rage {
+  from {
+    transform: translate3d(-5px, calc(-50% - 3px), 0) rotate(-5deg) scale(1.04);
+  }
+
+  to {
+    transform: translate3d(6px, calc(-50% + 3px), 0) rotate(6deg) scale(1.08);
+  }
+}
+
+@keyframes near-rage-mark {
+  from {
+    transform: translate(-4px, -3px) rotate(-8deg) scale(.9);
+  }
+
+  to {
+    transform: translate(5px, 2px) rotate(8deg) scale(1.15);
+  }
+}
+
+/* おはぎ成功点も、JUSTと同じアーケード文字で短く表示する。 */
+#stage.free-motion.success #burst {
+  left: 50%;
+  top: 25%;
+  width: max-content;
+  max-width: 90%;
+  padding: 0;
+  color: #ffe14d;
+  background: transparent;
+  border: 0;
+  font-family: Impact, "Arial Black", "Zen Kaku Gothic New", sans-serif !important;
+  font-size: clamp(42px, 12vw, 78px);
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: .01em;
+  text-shadow:
+    3px 3px 0 #7d3217,
+    -3px -3px 0 white,
+    6px 6px 0 #db3342,
+    0 0 22px #fff4a6;
+  transform: translateX(-50%) rotate(-7deg) skewX(-10deg);
+  animation: arcade-rank-pop .78s cubic-bezier(.16, .85, .28, 1) both !important;
+}
+
+/* =========================================
+   結果画面：初期格闘ゲーム風の対戦ポスター構図
+   義勇を大きく奥、怒る実弥を小さく手前に配置する。
+   ========================================= */
+.ending {
+  background:
+    radial-gradient(circle at 48% 18%, #d54435 0 14%, transparent 42%),
+    repeating-conic-gradient(from 205deg at 50% 35%,
+      #7b171a 0deg 5deg,
+      #3a0e12 6deg 11deg,
+      #b22b25 12deg 16deg);
+}
+
+.ending::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, transparent 0 67%, #16090ad9 88% 100%),
+    repeating-linear-gradient(164deg,
+      transparent 0 18px,
+      rgba(255, 210, 91, .13) 19px 21px,
+      transparent 22px 43px);
+}
+
+.ending-actors {
+  z-index: 1;
+  display: block;
+}
+
+.ending-actors img {
+  position: absolute;
+  margin: 0;
+  filter:
+    drop-shadow(0 13px 0 #25090b99) drop-shadow(0 24px 20px #120407aa);
+}
+
+.ending-actors .ending-giyu {
+  left: -13%;
+  top: 49%;
+  width: min(108vw, 690px);
+  opacity: .82;
+  transform: translateY(-50%) rotate(-5deg) !important;
+}
+
+.ending-actors .ending-sanemi {
+  right: 1%;
+  bottom: -2%;
+  z-index: 2;
+  width: min(48vw, 280px);
+  opacity: 1;
+  transform: rotate(7deg) !important;
+}
+
+.ending-card {
+  z-index: 3;
+  border: 4px solid #f0bd49;
+  border-radius: 4px;
+  color: #fff7dc;
+  background: rgba(35, 12, 14, .9);
+  box-shadow:
+    7px 7px 0 #16090a,
+    0 0 0 2px #8b251f,
+    0 18px 60px #120407cc;
+}
+
+.ending-kicker,
+.ending-record,
+.ending-history h3 {
+  color: #ffd657;
+}
+
+.ending-score strong {
+  color: #fff1a8;
+  text-shadow:
+    3px 3px 0 #b32426,
+    6px 6px 0 #16090a;
+}
+
+/* =========================================
+   手修正版：結果画面の視認性
+   ========================================= */
+
+/* TOP5の白っぽすぎる文字を濃くする */
+.ending-history {
+  border: 2px solid #b66a2c;
+  background: #fff0cf;
+}
+
+.ending-history h3,
+.ending-history li span {
+  color: #702d24;
+}
+
+.ending-history strong {
+  color: #291014;
+  text-shadow: none;
+}
+
+/* 暗い結果カード上の補足文とリンク */
+#recordNote {
+  color: #f2d7c4;
+}
+
+#viewRanking {
+  color: #ffd657;
+  font-weight: 700;
+}
+
+/* 回避評価を必ず横一列で表示する */
+#stage.rank-nice::after,
+#stage.rank-just::after,
+#stage.rank-perfect::after {
+  width: max-content;
+  max-width: 94%;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+  word-break: keep-all;
+}
+
+
+/* =========================================
+   義勇を吹き飛ばしている実弥
+   ========================================= */
+
+/*
+ * 被弾演出中は、実弥をその場で激しく震わせる。
+ * JavaScriptの座標には影響させず、CSSだけで動かす。
+ */
+#stage.free-motion.hit #sanemi {
+  z-index: 18;
+
+  animation:
+    sanemi-hit-fury .055s steps(2, end) infinite !important;
+
+  filter:
+    drop-shadow(0 0 9px #ff2e27) drop-shadow(0 0 20px #ff8d32) drop-shadow(0 6px 0 rgba(68, 20, 17, .35));
+}
+
+/* 実弥の頭上へ怒りマークを追加 */
+#stage.free-motion.hit #sanemi::after {
+  content: "💢 💢";
+  position: absolute;
+  left: 13%;
+  top: -31px;
+  z-index: 20;
+
+  width: 120px;
+  color: #ff322a;
+  font-size: 39px;
+  line-height: 1;
+  white-space: nowrap;
+
+  filter:
+    drop-shadow(0 2px 0 white) drop-shadow(0 0 8px #ff9a35);
+
+  animation:
+    sanemi-hit-marks .12s steps(2, end) infinite;
+}
+
+@keyframes sanemi-hit-fury {
+  0% {
+    transform:
+      translate3d(-13px, calc(-50% - 8px), 0) rotate(-11deg) scale(1.11);
+  }
+
+  50% {
+    transform:
+      translate3d(14px, calc(-50% + 7px), 0) rotate(12deg) scale(1.18);
+  }
+
+  100% {
+    transform:
+      translate3d(-9px, calc(-50% + 2px), 0) rotate(-8deg) scale(1.13);
+  }
+}
+
+@keyframes sanemi-hit-marks {
+  from {
+    transform:
+      translate(-7px, -5px) rotate(-10deg) scale(.9);
+  }
+
+  to {
+    transform:
+      translate(8px, 3px) rotate(10deg) scale(1.18);
+  }
+}
+
+
+/* =========================================
+   手修正版：見やすい残り時間バー
+   ========================================= */
+
+.time-track {
+  box-sizing: border-box;
+  height: 18px;
+  margin: 8px 3px 12px;
+  padding: 3px;
+
+  overflow: hidden;
+
+  background: #291719;
+  border: 3px solid #75432e;
+  border-radius: 9px;
+
+  box-shadow:
+    0 0 0 2px #fff5dc,
+    0 4px 0 rgba(76, 39, 26, .28);
+}
+
+#timeBar {
+  height: 100%;
+  min-width: 0;
+
+  background: #45bd49;
+  border-radius: 4px;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .55),
+    0 0 7px rgba(57, 200, 74, .7);
+
+  transition:
+    width .1s linear,
+    background-color .2s;
+}
+
+/* 残り5秒は赤く点滅 */
+body:has(#clock.urgent) #timeBar {
+  background: #ff3045;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .55),
+    0 0 10px rgba(255, 35, 59, .9);
+
+  animation:
+    time-bar-danger .34s ease-in-out infinite alternate;
+}
+
+@keyframes time-bar-danger {
+  from {
+    filter: brightness(.85);
+  }
+
+  to {
+    filter: brightness(1.35);
+  }
+}
+
+
+
+.scoreboard span {
+  color: #f3ddba;
+  font-weight: 700;
+}
+
+/* 数字を背景へ沈ませない */
+.scoreboard strong {
+  text-shadow:
+    2px 2px 0 #100708;
+}
+
+#time {
+  color: #ffea73;
+}
+
+#score {
+  color: #fffaf0;
+}
+
+#points {
+  color: #71e2ff;
+}
+
+/* コンボ欄のぼんやりした茶色を整理 */
+#comboPanel,
+#comboPanel.active {
+  min-width: 70px;
+  padding: 5px 8px;
+
+  color: white;
+  background: #6e302c;
+
+  border: 2px solid #e2ae51;
+  border-radius: 2px;
+
+  box-shadow: none;
+  transform: none;
+}
+
+#comboPanel::before,
+#comboPanel::after {
+  display: none;
+}
+
+#comboPanel strong {
+  color: #fff06d;
+  text-shadow:
+    2px 2px 0 #271012;
+}
+
+/* =========================================
+   時間バー
+   ========================================= */
+
+.time-track {
+  position: relative;
+  box-sizing: border-box;
+
+  height: 24px;
+  margin: -2px 7px 14px;
+  padding: 4px;
+
+  overflow: hidden;
+
+  background: #171113;
+  border: 3px solid #593124;
+  border-radius: 3px;
+
+  box-shadow:
+    0 3px 0 rgba(83, 42, 29, .3);
+}
+
+/* バーの上へ目盛りを重ねる */
+.time-track::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  z-index: 2;
+  pointer-events: none;
+
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 calc(10% - 2px),
+      rgba(20, 8, 10, .48) calc(10% - 2px) 10%);
+}
+
+/* 左側へTIME表示 */
+.time-track::before {
+  content: "TIME";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  z-index: 3;
+
+  color: white;
+  font-family:
+    Impact,
+    "Arial Black",
+    sans-serif !important;
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: .08em;
+
+  text-shadow:
+    1px 1px 0 #16090a;
+
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+#timeBar {
+  height: 100%;
+  min-width: 0;
+
+  background:
+    linear-gradient(180deg,
+      #7beb69 0%,
+      #35b94a 52%,
+      #188532 100%);
+
+  border-radius: 0;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .55),
+    0 0 8px rgba(54, 204, 80, .75);
+
+  transition:
+    width .1s linear,
+    background .2s;
+}
+
+/* 残り5秒は明確に赤くする */
+body:has(#clock.urgent) #timeBar {
+  background:
+    linear-gradient(180deg,
+      #ff7a68 0%,
+      #ff3045 52%,
+      #b90f29 100%);
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .55),
+    0 0 10px rgba(255, 38, 61, .9);
+
+  animation:
+    hud-time-danger .32s ease-in-out infinite alternate;
+}
+
+@keyframes hud-time-danger {
+  from {
+    filter: brightness(.82);
+  }
+
+  to {
+    filter: brightness(1.3);
+  }
+}
+
+/* =========================================
+   メッセージと開始ボタン
+   ========================================= */
+
+/* 白い丸角カードから、ゲームの情報パネルへ */
+.message-box {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 11px;
+  padding: 12px 14px;
+
+  background: #fff9e9;
+
+  border: 3px solid #744331;
+  border-left: 9px solid #b73d32;
+  border-radius: 3px;
+
+  box-shadow:
+    4px 4px 0 rgba(83, 42, 29, .25);
+}
+
+.message-box h2 {
+  color: #9f302b;
+  text-shadow: none;
+}
+
+.message-box p {
+  color: #32201b;
+  font-weight: 700;
+}
+
+/* 開始ボタンも丸薬型をやめる */
+#action {
+  margin-top: 14px;
+  padding: 13px 16px;
+
+  color: white;
+  background:
+    linear-gradient(180deg,
+      #bd4738 0%,
+      #973127 65%,
+      #74231f 100%);
+
+  border: 3px solid #61291f;
+  border-top-color: #e0aa4c;
+  border-radius: 3px;
+
+  font-size: 19px;
+
+  text-shadow:
+    2px 2px 0 #431713;
+
+  box-shadow:
+    0 5px 0 #68291f;
+}
+
+#action:hover {
+  filter: brightness(1.08);
+}
+
+#action:active {
+  translate: 0 4px;
+  box-shadow:
+    0 1px 0 #68291f;
+}
+
+@media not all {
+  /* =========================================
+   手修正版：ストII風イエローHUD
+   フォントは変更せず、色・輪郭・勢いだけ整える
+   ========================================= */
+
+  :root {
+    --fight-yellow: #ffd83d;
+    --fight-orange: #ed9228;
+    --fight-red: #c7352d;
+    --fight-green: #277a42;
+    --fight-ink: #291712;
+    --fight-cream: #fff1b8;
+  }
+
+  /* タイトル部分を、黄色い格闘ゲームの看板にする */
+  header {
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 12px 18px 15px;
+
+    color: var(--fight-ink);
+
+    background:
+      repeating-conic-gradient(from -18deg at 50% 130%,
+        rgb(255 255 255 / 22%) 0deg 5deg,
+        transparent 6deg 14deg),
+      linear-gradient(135deg,
+        #ffe866 0%,
+        var(--fight-yellow) 48%,
+        var(--fight-orange) 100%);
+
+    border: 4px solid var(--fight-ink);
+    border-radius: 3px;
+
+    box-shadow:
+      5px 5px 0 var(--fight-red);
+  }
+
+  .eyebrow {
+    color: #762a21;
+    font-weight: 900;
+    letter-spacing: .15em;
+  }
+
+  header h1 {
+    color: var(--fight-ink);
+    line-height: .95;
+    text-shadow: 2px 2px 0 #fff3a3;
+  }
+
+  header h1 strong {
+    display: inline-block;
+
+    color: #d83b2f;
+    font-style: italic;
+
+    transform: skewX(-8deg);
+
+    text-shadow:
+      -2px -2px 0 #fff06b,
+      3px 3px 0 var(--fight-ink),
+      6px 6px 0 var(--fight-orange);
+  }
+
+  header>p:last-child {
+    color: var(--fight-ink);
+    font-weight: 900;
+  }
+
+  /* 黒い箱をやめ、タイトルとつながる明るいHUDにする */
+  .scoreboard {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 14px 0 0;
+    padding: 8px 12px;
+
+    color: var(--fight-ink);
+
+    background:
+      linear-gradient(105deg,
+        #fff0a1 0%,
+        #ffd94d 76%,
+        #e14935 77%,
+        #be2d2b 100%);
+
+    border: 4px solid var(--fight-ink);
+    border-radius: 3px;
+
+    box-shadow:
+      5px 5px 0 var(--fight-orange);
+  }
+
+  .scoreboard span {
+    color: #4b271d;
+    font-weight: 900;
+  }
+
+  .scoreboard strong {
+    text-shadow: 1px 1px 0 #fff6be;
+  }
+
+  #time {
+    color: #a52525;
+  }
+
+  #score {
+    color: var(--fight-green);
+  }
+
+  #points {
+    color: #234e77;
+  }
+
+  #comboPanel {
+    padding: 3px 8px;
+
+    color: white;
+    background: var(--fight-red);
+
+    border: 3px solid var(--fight-ink);
+    border-radius: 2px;
+
+    transform: skewX(-7deg);
+  }
+
+  #comboPanel strong,
+  #comboPanel span {
+    display: inline-block;
+    color: white;
+    text-shadow: 2px 2px 0 #6d171b;
+    transform: skewX(7deg);
+  }
+
+  /* 分割された緑バーをやめる */
+  .time-track {
+    position: relative;
+    box-sizing: border-box;
+
+    height: 20px;
+    margin: 6px 5px 15px;
+    padding: 3px;
+    overflow: hidden;
+
+    background: var(--fight-ink);
+
+    border: 3px solid var(--fight-ink);
+    border-radius: 2px;
+
+    box-shadow:
+      3px 3px 0 var(--fight-orange);
+  }
+
+  /* 以前追加したTIME文字や縦線を消す */
+  .time-track::before,
+  .time-track::after {
+    content: none;
+  }
+
+  /*
+ * 色はJavaScriptから渡される。
+ * 残り時間が減るほど、緑→黄→赤へ変化する。
+ */
+  #timeBar {
+    height: 100%;
+
+    background: var(--time-color,
+        hsl(120 85% 47%));
+
+    border-radius: 0;
+
+    box-shadow:
+      inset 0 3px 0 rgb(255 255 255 / 45%),
+      inset 0 -3px 0 rgb(0 0 0 / 20%);
+
+    transition:
+      width .1s linear,
+      background-color .12s linear;
+  }
+
+  /* セリフ欄も同じ世界観に合わせる */
+  .message-box {
+    background: var(--fight-cream);
+
+    border: 4px solid var(--fight-ink);
+    border-radius: 3px;
+
+    box-shadow:
+      5px 5px 0 var(--fight-orange);
+  }
+
+  .message-box h2 {
+    color: #b72b29;
+
+    text-shadow:
+      1px 1px 0 white,
+      2px 2px 0 #efb02d;
+  }
+
+  .message-box p {
+    color: #39231d;
+  }
+
+  /* 開始ボタン */
+  #action {
+    color: white;
+
+    background:
+      linear-gradient(to bottom,
+        #ed5540,
+        #bd272b);
+
+    border: 4px solid var(--fight-ink);
+    border-top-color: #ffdc4c;
+    border-radius: 3px;
+
+    box-shadow:
+      5px 5px 0 var(--fight-orange);
+
+    text-shadow:
+      2px 2px 0 #70151a;
+  }
+
+  #action:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+
+    box-shadow:
+      7px 7px 0 var(--fight-orange);
+  }
+
+  #action:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--fight-orange);
+  }
+
+  /* 黄色HUDの無効化ここまで */
+}
+
+
+/* =========================================
+   格ゲー風：被弾KO吹っ飛び
+   ========================================= */
+
+/*
+ * 大きな弧を描き、回転しながら画面外へ飛ぶ。
+ * 飛ぶ左右はJavaScriptから受け取る。
+ */
+#stage.free-motion.hit #giyu {
+  z-index: 30;
+
+  animation:
+    giyu-fighting-ko .82s cubic-bezier(.12, .72, .18, 1) both !important;
+
+  filter:
+    drop-shadow(0 0 8px white) drop-shadow(0 0 17px #52cfff) drop-shadow(0 10px 8px rgb(44 19 13 / 35%));
+}
+
+@keyframes giyu-fighting-ko {
+  0% {
+    opacity: 1;
+
+    transform:
+      translate3d(0, -50%, 0) rotate(0) scale(1);
+  }
+
+  /* 攻撃を受けた瞬間、一度大きく浮く */
+  16% {
+    opacity: 1;
+
+    transform:
+      translate3d(var(--giyu-ko-near),
+        calc(-50% - 105px),
+        0) rotate(95deg) scale(1.18);
+  }
+
+  /* 画面中央を大きく横切る */
+  48% {
+    opacity: 1;
+
+    transform:
+      translate3d(var(--giyu-ko-middle),
+        calc(-50% - 185px),
+        0) rotate(360deg) scale(.92);
+  }
+
+  /* 遠くへ飛んで小さくなる */
+  78% {
+    opacity: .85;
+
+    transform:
+      translate3d(var(--giyu-ko-far),
+        calc(-50% - 115px),
+        0) rotate(var(--giyu-ko-spin)) scale(.42);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate3d(var(--giyu-ko-far),
+        calc(-50% + 60px),
+        0) rotate(var(--giyu-ko-spin)) scale(.12);
+  }
+}
+
+/* 被弾時はステージ全体も一瞬揺らす */
+#stage.free-motion.hit {
+  animation:
+    fighting-ko-shake .34s steps(2, end) both;
+}
+
+@keyframes fighting-ko-shake {
+
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  20% {
+    translate: -8px 4px;
+  }
+
+  40% {
+    translate: 9px -5px;
+  }
+
+  60% {
+    translate: -6px -3px;
+  }
+
+  80% {
+    translate: 5px 3px;
+  }
+}
+
+/* 「ぴょーーん！！」もKO文字のように大きく出す */
+#stage.free-motion.hit #burst {
+  left: 50%;
+  top: 23%;
+  z-index: 40;
+
+  width: max-content;
+  max-width: 92%;
+  padding: 0;
+
+  color: #ffe84f;
+  background: transparent;
+  border: 0;
+
+  font-family:
+    Impact,
+    "Arial Black",
+    "Zen Kaku Gothic New",
+    sans-serif !important;
+
+  font-size: clamp(52px, 14vw, 88px);
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+
+  text-shadow:
+    -3px -3px 0 white,
+    3px 3px 0 #861d25,
+    7px 7px 0 #251014,
+    0 0 22px #ff4b32;
+
+  transform:
+    translateX(-50%) rotate(-8deg) skewX(-10deg);
+
+  animation:
+    fighting-ko-text .82s cubic-bezier(.15, .85, .25, 1) both !important;
+}
+
+@keyframes fighting-ko-text {
+  0% {
+    opacity: 0;
+    scale: .15;
+  }
+
+  18% {
+    opacity: 1;
+    scale: 1.28;
+  }
+
+  38% {
+    scale: .96;
+  }
+
+  65% {
+    opacity: 1;
+    scale: 1.05;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.4;
+  }
+}
+
+
+/* =========================================
+   ゲーム画面内：格闘ゲームHUD
+   ========================================= */
+
+#stage>.scoreboard {
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  right: 12px;
+  z-index: 45;
+
+  display: grid;
+  grid-template-columns:
+    1.2fr 1fr 1fr .9fr;
+
+  align-items: center;
+  gap: 5px;
+
+  box-sizing: border-box;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 7px 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(100deg,
+      rgb(18 23 33 / 94%),
+      rgb(48 20 24 / 94%));
+
+  border: 2px solid #f1c34d;
+  border-radius: 2px;
+
+  box-shadow:
+    0 3px 0 #351719,
+    0 5px 12px rgb(22 10 12 / 38%);
+
+  clip-path:
+    polygon(2% 0,
+      98% 0,
+      100% 50%,
+      98% 100%,
+      2% 100%,
+      0 50%);
+}
+
+#stage>.scoreboard>div {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#stage>.scoreboard span {
+  color: #f9e7ae;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+#stage>.scoreboard strong {
+  color: white;
+  font-size: clamp(17px, 4.5vw, 25px);
+  line-height: 1;
+  text-shadow:
+    2px 2px 0 #171017;
+}
+
+#stage #clock strong {
+  color: #ffdf4e;
+}
+
+#stage #points {
+  color: #72d9ff;
+}
+
+#stage #score {
+  color: #ff9a63;
+}
+
+#stage #comboPanel {
+  padding: 4px 5px;
+
+  color: white;
+  background: #b92f39;
+
+  border: 1px solid #ffb94c;
+  border-radius: 2px;
+
+  transform: skewX(-7deg);
+}
+
+#stage #comboPanel strong,
+#stage #comboPanel span {
+  display: inline-block;
+  transform: skewX(7deg);
+}
+
+#stage #comboPanel.active {
+  background: #d84a2c;
+
+  box-shadow:
+    0 0 9px #ffdc55,
+    inset 0 0 7px #ff8d3a;
+}
+
+/* HUD直下の時間ゲージ */
+#stage>.time-track {
+  position: absolute;
+  top: 58px;
+  left: 19px;
+  right: 19px;
+  z-index: 44;
+
+  box-sizing: border-box;
+  width: auto;
+  height: 14px;
+  margin: 0;
+  padding: 2px;
+  overflow: hidden;
+
+  background: #2c1919;
+
+  border: 2px solid #f1c34d;
+  border-radius: 2px;
+
+  box-shadow:
+    0 3px 0 rgb(42 16 17 / 48%);
+}
+
+#stage>.time-track::before,
+#stage>.time-track::after {
+  content: none;
+}
+
+#stage #timeBar {
+  height: 100%;
+
+  background:
+    linear-gradient(90deg,
+      #e63d3a 0%,
+      #ffd84d 48%,
+      #50c865 100%);
+
+  border-radius: 0;
+
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 48%);
+
+  transition:
+    width .1s linear;
+}
+
+/* HUDと説明文が重ならないようにする */
+#stage>.hint {
+  top: 79px;
+  z-index: 20;
+
+  color: #5d4135;
+  text-shadow: 0 1px 0 white;
+}
+
+
+/* =========================================
+   HTMLを動かさない格闘ゲームHUD
+   ========================================= */
+
+main>.scoreboard {
+  display: grid;
+  grid-template-columns:
+    1.2fr 1fr 1fr .9fr;
+
+  align-items: center;
+  gap: 5px;
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 10px 0 7px;
+  padding: 9px 14px;
+
+  color: white;
+
+  background:
+    linear-gradient(100deg,
+      #172944 0%,
+      #20385c 49%,
+      #64222b 51%,
+      #42161d 100%);
+
+  border: 3px solid #281419;
+  border-radius: 2px;
+
+  box-shadow:
+    inset 0 0 0 2px #e9b940,
+    0 4px 0 #8e2c27,
+    0 7px 12px rgb(40 16 18 / 24%);
+
+  clip-path:
+    polygon(2% 0,
+      98% 0,
+      100% 50%,
+      98% 100%,
+      2% 100%,
+      0 50%);
+}
+
+main>.scoreboard>div {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+main>.scoreboard span {
+  color: #f8e8b7;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+main>.scoreboard strong {
+  color: white;
+  font-size: clamp(18px, 4.8vw, 27px);
+  line-height: 1;
+
+  text-shadow:
+    2px 2px 0 #100b10;
+}
+
+main>.scoreboard #time {
+  color: #ffe054;
+}
+
+main>.scoreboard #score {
+  color: #ff9c62;
+}
+
+main>.scoreboard #points {
+  color: #69d9ff;
+}
+
+main>.scoreboard #comboPanel {
+  padding: 5px 4px;
+
+  background:
+    linear-gradient(to bottom,
+      #c6383d,
+      #7f202a);
+
+  border: 1px solid #ffbd4c;
+  border-radius: 2px;
+
+  transform: skewX(-7deg);
+}
+
+main>.scoreboard #comboPanel strong,
+main>.scoreboard #comboPanel span {
+  display: inline-block;
+  color: white;
+  transform: skewX(7deg);
+}
+
+main>.scoreboard #comboPanel.active {
+  background:
+    linear-gradient(to bottom,
+      #ef6236,
+      #af272a);
+
+  box-shadow:
+    0 0 11px #ffce45,
+    inset 0 0 7px #ff9d42;
+}
+
+/* 時間ゲージの外枠 */
+main>.time-track {
+  box-sizing: border-box;
+  width: calc(100% - 16px);
+  height: 17px;
+  margin: 0 8px 13px;
+  padding: 3px;
+  overflow: hidden;
+
+  background: #211318;
+
+  border: 2px solid #211318;
+  border-radius: 2px;
+
+  box-shadow:
+    0 0 0 2px #e7b941,
+    0 4px 0 #76252a;
+}
+
+main>.time-track::before,
+main>.time-track::after {
+  content: none;
+}
+
+main>.time-track #timeBar {
+  height: 100%;
+  border-radius: 0;
+
+  box-shadow:
+    inset 0 3px 0 rgb(255 255 255 / 38%),
+    inset 0 -2px 0 rgb(0 0 0 / 24%);
+
+  transition:
+    width .1s linear,
+    background .25s ease;
+}
+
+/* 30～15秒：緑 */
+main>.time-track #timeBar[data-state="safe"] {
+  background:
+    linear-gradient(to bottom,
+      #78e86c,
+      #2ba44b);
+}
+
+/* 15～5秒：黄色 */
+main>.time-track #timeBar[data-state="warning"] {
+  background:
+    linear-gradient(to bottom,
+      #fff36a,
+      #e8a72d);
+}
+
+/* 残り5秒：赤 */
+main>.time-track #timeBar[data-state="danger"] {
+  background:
+    linear-gradient(to bottom,
+      #ff7455,
+      #d22432);
+
+  animation:
+    time-danger-flash .34s steps(2, end) infinite;
+}
+
+@keyframes time-danger-flash {
+  from {
+    filter:
+      brightness(1) drop-shadow(0 0 2px #ffdc4c);
+  }
+
+  to {
+    filter:
+      brightness(1.42) drop-shadow(0 0 8px #ff432f);
+  }
+}
+
+/* =========================================
+   タイトル：回避表示と同じアーケード文字
+   ========================================= */
+
+header h1 {
+  display: block;
+  width: max-content;
+  max-width: 94%;
+  margin: 2px auto 8px;
+
+  color: #65d9ff;
+
+  font-family:
+    Impact,
+    "Arial Black",
+    "Zen Kaku Gothic New",
+    sans-serif !important;
+
+  font-size: clamp(31px, 8vw, 48px);
+  font-style: italic;
+  font-weight: 900;
+  line-height: .88;
+  letter-spacing: .01em;
+
+  text-shadow:
+    3px 3px 0 #12394d,
+    -2px -2px 0 white,
+    6px 6px 0 #24202c,
+    0 0 15px #69dfff;
+
+  transform:
+    rotate(-4deg) skewX(-9deg);
+
+  animation:
+    title-arcade-entry .65s cubic-bezier(.16, .85, .28, 1) both;
+}
+
+header h1 strong {
+  display: block;
+
+  color: #ff9b3d;
+
+  font-family: inherit !important;
+  font-size: 1.32em;
+  font-style: inherit;
+  font-weight: inherit;
+  letter-spacing: .01em;
+
+  text-shadow:
+    3px 3px 0 #662713,
+    -3px -3px 0 white,
+    7px 7px 0 #b72f39,
+    0 0 20px #ffc14f;
+
+  transform: none;
+}
+
+header .eyebrow {
+  color: #a83336;
+  font-weight: 900;
+  letter-spacing: .22em;
+}
+
+header>p:last-child {
+  color: #382027;
+  font-weight: 800;
+}
+
+@keyframes title-arcade-entry {
+  0% {
+    opacity: 0;
+    scale: 2.1;
+    rotate: -11deg;
+  }
+
+  45% {
+    opacity: 1;
+    scale: .9;
+  }
+
+  70% {
+    scale: 1.08;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+
+/* =========================================
+   水色＋薄緑：最終カラーバランス調整
+   ========================================= */
+
+:root {
+  --fight-sky: #69d5ed;
+  --fight-sky-dark: #287d98;
+  --fight-green: #c8eba2;
+  --fight-green-dark: #477f69;
+  --fight-navy: #173653;
+  --fight-cream: #f8fff0;
+}
+
+/* HUDの両端が切れて見える原因だったclip-pathを解除 */
+main>.scoreboard {
+  clip-path: none !important;
+  border: 3px solid var(--fight-navy) !important;
+  border-radius: 6px !important;
+
+  background:
+    linear-gradient(100deg,
+      #173653 0 50%,
+      #356d68 50% 100%) !important;
+
+  box-shadow:
+    inset 0 0 0 2px var(--fight-green),
+    0 5px 0 var(--fight-green-dark) !important;
+}
+
+/* コンボ表示も同じ配色へ */
+main>.scoreboard #comboPanel {
+  background:
+    linear-gradient(#70d9e8,
+      #397e78) !important;
+
+  border-color: var(--fight-green) !important;
+}
+
+/* 残り時間バーの外枠 */
+main>.time-track {
+  border-color: var(--fight-navy) !important;
+
+  box-shadow:
+    0 0 0 2px var(--fight-green),
+    0 4px 0 var(--fight-green-dark) !important;
+}
+
+/* 左だけ赤かったセリフ枠を修正 */
+.message-box {
+  border: 3px solid var(--fight-green-dark) !important;
+  border-left: 3px solid var(--fight-green-dark) !important;
+  border-radius: 7px !important;
+
+  background:
+    linear-gradient(135deg,
+      #f8fff0,
+      #e4f8f4) !important;
+
+  box-shadow:
+    5px 5px 0 #9ccfbd !important;
+}
+
+.message-box h2 {
+  color: var(--fight-sky-dark) !important;
+
+  text-shadow:
+    1px 1px 0 white,
+    2px 2px 0 #b9e8d2 !important;
+}
+
+.message-box p {
+  color: #294c53 !important;
+}
+
+/* 操作ボタンも赤から水色へ */
+#action {
+  color: white !important;
+
+  background:
+    linear-gradient(#63d4e7,
+      #318ea5) !important;
+
+  border: 3px solid var(--fight-navy) !important;
+  border-top-color: #e7ffd0 !important;
+
+  box-shadow:
+    0 5px 0 var(--fight-green-dark) !important;
+}
+
+/* 仮タイトル：オレンジを廃止 */
+header h1 {
+  color: var(--fight-sky) !important;
+
+  transform:
+    rotate(-2deg) skewX(-5deg) !important;
+
+  text-shadow:
+    2px 2px 0 white,
+    5px 5px 0 var(--fight-sky-dark) !important;
+}
+
+header h1 strong {
+  color: var(--fight-green) !important;
+
+  text-shadow:
+    2px 2px 0 white,
+    5px 5px 0 var(--fight-green-dark),
+    0 0 14px #e8ffd1 !important;
+}
+
+/* =========================================
+   パネルとボタンの影を整理
+   ========================================= */
+
+.message-box {
+  box-shadow: none !important;
+}
+
+.message-box h2,
+.message-box p {
+  text-shadow: none !important;
+}
+
+#action {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+#action:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none !important;
+}
+
+
+/* =========================================
+   HUDの影を整理して視認性を上げる
+   ========================================= */
+
+main>.scoreboard {
+  box-shadow:
+    inset 0 0 0 2px var(--fight-green) !important;
+}
+
+main>.scoreboard strong,
+main>.scoreboard span {
+  text-shadow: none !important;
+}
+
+/* 大きな数字だけ最低限の暗い縁を残す */
+main>.scoreboard strong {
+  text-shadow:
+    1px 1px 0 #071a27 !important;
+}
+
+/* 時間バー下のずれた影も除去 */
+main>.time-track {
+  box-shadow:
+    0 0 0 2px var(--fight-green) !important;
+}
+
+/* =========================================
+   スマホ版：最終上書き
+   既存デザインを保ち、横方向の見切れを防ぐ
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    display: block;
+    padding:
+      max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    box-sizing: border-box;
+  }
+
+  main {
+    width: 100% !important;
+    max-width: 480px;
+    min-width: 0;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  /* タイトルがスマホ幅を押し広げないようにする */
+  header {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  header h1 {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: auto;
+    font-size: clamp(34px, 12vw, 48px) !important;
+    line-height: .92 !important;
+    white-space: normal !important;
+    box-sizing: border-box;
+  }
+
+  header h1 strong {
+    font-size: 1.04em !important;
+  }
+
+  header>p:not(.eyebrow) {
+    max-width: 100%;
+    padding-inline: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: normal !important;
+    box-sizing: border-box;
+  }
+
+  /* 自己ベストと音ボタン */
+  .toolbar {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* 4項目を2列×2段にして文字潰れを防ぐ */
+  main>.scoreboard {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    gap: 3px;
+    padding: 7px !important;
+    box-sizing: border-box;
+  }
+
+  main>.scoreboard>div {
+    min-width: 0 !important;
+    padding: 3px 2px;
+  }
+
+  main>.scoreboard span {
+    font-size: 9px !important;
+    white-space: nowrap;
+  }
+
+  main>.scoreboard strong {
+    font-size: clamp(21px, 7vw, 27px) !important;
+  }
+
+  main>.time-track {
+    width: calc(100% - 12px) !important;
+    max-width: calc(100% - 12px);
+    margin-inline: auto;
+    box-sizing: border-box;
+  }
+
+  /* 後半に重複しているstage指定より強くする */
+  #stage,
+  #stage.free-motion {
+    width: 100% !important;
+    max-width: 100%;
+    height: clamp(320px, 92vw, 360px) !important;
+    box-sizing: border-box;
+    touch-action: none;
+  }
+
+  .actor {
+    width: 92px !important;
+    height: 106px !important;
+  }
+
+  /* 操作説明をステージ内で折り返す */
+  #stage .hint {
+    left: 50% !important;
+    width: min(88%, 310px);
+    max-width: 88%;
+    white-space: normal !important;
+    line-height: 1.4;
+    box-sizing: border-box;
+  }
+
+  .message-box,
+  #action,
+  footer {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .message-box h2 {
+    font-size: 18px;
+  }
+
+  .message-box p {
+    font-size: 13px;
+  }
+
+  #action {
+    min-height: 52px;
+  }
+
+  /* 結果画面も左右を切らさない */
+  .ending-card {
+    width: min(92vw, 440px) !important;
+    max-height: 88dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+}
+
+
+/* スマホで既存の最小横幅を解除する */
+@media (max-width: 600px) {
+
+  html,
+  body,
+  main,
+  header,
+  .toolbar,
+  main>.scoreboard,
+  main>.time-track,
+  #stage,
+  .message-box,
+  #action,
+  footer {
+    min-width: 0 !important;
+  }
+}
+
+/* =========================================
+   スマホ最終調整
+   ========================================= */
+@media (max-width: 600px) {
+
+  /*
+   * 開始前。
+   * 開始ボタンまで画面内へ収める。
+   */
+  #stage {
+    height: clamp(220px, 36dvh, 260px) !important;
+    min-height: 220px !important;
+    max-height: 260px !important;
+  }
+
+  /*
+   * プレイ中。
+   * is-playingはJavaScriptからbodyへ付けられる。
+   */
+  body.is-playing #stage {
+    height: clamp(300px, 50dvh, 340px) !important;
+    min-height: 300px !important;
+    max-height: 340px !important;
+  }
+
+  /*
+   * プレイ中だけ不要な部分を隠す。
+   * タイトルは残す。
+   */
+  body.is-playing .toolbar,
+  body.is-playing #action,
+  body.is-playing footer {
+    display: none !important;
+  }
+
+  body.is-playing header {
+    display: block !important;
+    margin-bottom: 4px !important;
+  }
+
+  body.is-playing main {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  /*
+   * ステージ内の操作説明。
+   */
+  #stage>#hint.hint {
+    position: absolute !important;
+    top: 48px !important;
+    left: 50% !important;
+    right: auto !important;
+
+    width: calc(100% - 24px) !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: translateX(-50%) !important;
+
+    color: #40362c;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center !important;
+    white-space: nowrap;
+  }
+
+  /*
+   * スマホの結果画面。
+   */
+  .ending {
+    justify-content: flex-start !important;
+    align-items: center !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    padding: 8px 0 24px !important;
+  }
+
+  .ending[hidden] {
+    display: none !important;
+  }
+
+  /*
+   * 巨大な義勇を背景として独立させる。
+   * PC版と同様、大胆に見切れさせる。
+   */
+  .ending::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 1;
+    pointer-events: none;
+
+    background-image:
+      url("./images/giyu-attack.png");
+    background-repeat: no-repeat;
+    background-position: -18vw center;
+    background-size: auto 92dvh;
+
+    opacity: .42;
+    transform: rotate(-3deg);
+    transform-origin: center;
+  }
+
+  /*
+   * 元の義勇画像は非表示。
+   * ::beforeで背景表示する。
+   */
+  .ending-actors .ending-giyu {
+    display: none !important;
+  }
+
+  /*
+   * 実弥だけを手前へ表示する。
+   */
+  .ending-actors {
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100vw !important;
+    height: 100dvh !important;
+
+    overflow: hidden !important;
+    pointer-events: none !important;
+
+    z-index: 4 !important;
+  }
+
+  .ending-actors .ending-sanemi {
+    position: absolute !important;
+    right: 5vw !important;
+    top: 6px !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    width: auto !important;
+    height: 82px !important;
+    max-width: 28vw !important;
+    max-height: 82px !important;
+
+    opacity: 1 !important;
+
+    transform: rotate(7deg) !important;
+  }
+
+  /*
+   * 結果カードは画面の左右中央へ固定。
+   */
+  .ending-card {
+    position: relative !important;
+    z-index: 3 !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    width: calc(100vw - 28px) !important;
+    max-width: 340px !important;
+    box-sizing: border-box !important;
+
+    margin: 94px auto 18px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
+    max-height: none !important;
+    overflow: visible !important;
+
+    background: rgba(35, 12, 14, .84) !important;
+  }
+}
+
+
+/* =========================================
+   スマホ結果画面：位置の最終修正
+   ========================================= */
+@media (max-width: 600px) {
+
+  /* 結果カードを画面中央へ配置 */
+  .ending {
+    grid-template-columns: 100% !important;
+    justify-content: center !important;
+    justify-items: center !important;
+  }
+
+  .ending-card {
+    z-index: 3 !important;
+    justify-self: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /*
+   * 疑似要素で表示していた義勇は消す。
+   * 実際のimg要素を使った方が位置を調整しやすい。
+   */
+  .ending::before {
+    content: none !important;
+  }
+
+  /* キャラクターは結果カードの後ろ */
+  .ending-actors {
+    z-index: 2 !important;
+  }
+
+  /*
+   * 義勇を左上へ配置。
+   * 顔と上半身はカードの上から見え、
+   * 下半身はカードの後ろへ隠れる。
+   */
+  .ending-actors .ending-giyu {
+    display: block !important;
+    position: absolute !important;
+
+    left: 50% !important;
+    top: -45px !important;
+    right: auto !important;
+    bottom: auto !important;
+
+    width: auto !important;
+    height: min(54dvh, 400px) !important;
+    max-width: 72vw !important;
+    max-height: none !important;
+
+    object-fit: contain !important;
+    opacity: .58 !important;
+
+    transform: translateX(-50%) rotate(-5deg) !important;
+  }
+
+  /* 実弥は現在の右上位置を維持 */
+  .ending-actors .ending-sanemi {
+    z-index: 2 !important;
+  }
+}
+
+/* タブレット縦向き：結果画面の義勇を見せる */
+@media (min-width: 601px) and (max-width: 900px) and (orientation: portrait) {
+
+  .ending-actors .ending-giyu {
+    left: 1% !important;
+    top: 3% !important;
+    bottom: auto !important;
+
+    width: min(68vw, 520px) !important;
+    height: auto !important;
+
+    transform: rotate(-5deg) !important;
+  }
+
+  /* タブレット縦向きでは、義勇を見せるためカードを右へ寄せる */
+  .ending {
+    grid-template-columns: 100% !important;
+    justify-items: center !important;
+  }
+
+  .ending-card {
+    justify-self: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    /* 義勇の顔が見えるよう、カードだけ少し下げる */
+    transform: translateY(5vh) !important;
+  }
+}
+
+/* =========================================
+   操作中の義勇
+   actorの座標は動かさず、画像だけを小刻みに動かす
+   ========================================= */
+#stage.free-motion.controlling:not(.hit):not(.success) #giyuImage {
+  transform-origin: 50% 88%;
+  animation:
+    giyu-control-motion .13s ease-in-out infinite alternate !important;
+}
+
+@keyframes giyu-control-motion {
+  from {
+    transform:
+      translate(-3px, -6px) rotate(-4deg) scale(1.03);
+  }
+
+  to {
+    transform:
+      translate(4px, 7px) rotate(4deg) scale(.98);
+  }
+}
+
+/* =========================================
+   残り10秒：ブチギレモード
+   ========================================= */
+
+#finalRush[hidden] {
+  display: none;
+}
+
+/* 最初の0.75秒だけ表示する暗転演出 */
+#finalRush {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  pointer-events: none;
+  text-align: center;
+  background: rgba(25, 0, 4, .78);
+
+  animation:
+    final-rush-screen .75s ease-out both;
+}
+
+/* 「10」と「秒」をまとめる親要素 */
+#finalRush strong {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  color: #fff068;
+  line-height: .72;
+  white-space: nowrap;
+
+  animation:
+    final-rush-slam .75s cubic-bezier(.15, .9, .2, 1.2) both;
+}
+
+/* 巨大な10 */
+#finalRush strong b {
+  font-size: clamp(110px, 34vw, 230px);
+  font-style: italic;
+  letter-spacing: -.12em;
+
+  -webkit-text-stroke:
+    clamp(3px, 1vw, 8px) #721019;
+
+  text-shadow:
+    6px 6px 0 #e32330,
+    12px 12px 0 #21060a;
+}
+
+/* 小さな「秒」 */
+#finalRush strong small {
+  margin: 0 0 4px 9px;
+
+  color: white;
+  font-size: clamp(28px, 8vw, 58px);
+  font-weight: 900;
+
+  -webkit-text-stroke: 2px #721019;
+
+  text-shadow:
+    4px 4px 0 #e32330;
+}
+
+/* 実弥、ブチギレ！ */
+#finalRush span {
+  position: absolute;
+  z-index: 3;
+
+  left: 50%;
+  top: 68%;
+
+  color: white;
+  font-size: clamp(23px, 6vw, 40px);
+  font-weight: 900;
+  letter-spacing: .05em;
+  white-space: nowrap;
+
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+
+  transform:
+    translateX(-50%) rotate(-6deg);
+
+  text-shadow:
+    3px 3px 0 #721019,
+    0 0 10px #ff2535;
+}
+
+/* FINAL中のステージ外周 */
+#stage.final-rush {
+  border-color: #e92834;
+
+  animation:
+    final-rush-border .34s steps(2, end) infinite;
+}
+
+/* 実弥本体を赤く強調 */
+#stage.final-rush #sanemiImage {
+  position: relative;
+  z-index: 2;
+
+  filter:
+    saturate(1.5) contrast(1.08) drop-shadow(0 0 9px #ff9c28) drop-shadow(0 0 19px #ff2738);
+}
+
+/* =========================================
+   FINAL：実弥の怒りオーラ
+   ========================================= */
+
+
+/* FINAL中に増える怒りマーク */
+#stage.final-rush:not(.success) #sanemi::after {
+  content: "💢　💢\A　💢";
+
+  position: absolute;
+  z-index: 4;
+
+  left: 50%;
+  top: 42%;
+
+  width: 210%;
+
+  font-size: clamp(22px, 5vw, 38px);
+  line-height: 1.55;
+  white-space: pre;
+  text-align: center;
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(0 2px 0 #fff3a2) drop-shadow(0 0 7px #ff352f);
+
+  animation:
+    sanemi-final-rage-marks .2s steps(2, end) infinite alternate;
+}
+
+/* =========================================
+   FINAL：焦る義勇の汗
+   ========================================= */
+
+#stage.final-rush.free-motion.controlling:not(.hit):not(.success) #giyu::after {
+  content: "💦　💦";
+
+  position: absolute;
+  z-index: 8;
+
+  right: -42px;
+  top: -18px;
+
+  font-size: clamp(18px, 4vw, 29px);
+  line-height: 1;
+  white-space: nowrap;
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(0 2px 0 white) drop-shadow(0 0 5px #50cfff);
+
+  animation:
+    giyu-final-sweat .7s ease-out infinite;
+}
+
+/* =========================================
+   FINAL用アニメーション
+   ========================================= */
+
+@keyframes final-rush-screen {
+  0% {
+    opacity: 0;
+    background: rgba(255, 255, 255, .95);
+  }
+
+  12% {
+    opacity: 1;
+    background: rgba(25, 0, 4, .92);
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes final-rush-slam {
+  0% {
+    opacity: 0;
+    transform:
+      rotate(-10deg) scale(2.8);
+  }
+
+  35% {
+    opacity: 1;
+    transform:
+      rotate(-4deg) scale(.86);
+  }
+
+  58% {
+    transform:
+      rotate(-6deg) scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      rotate(-5deg) scale(1);
+  }
+}
+
+@keyframes final-rush-border {
+  from {
+    box-shadow:
+      inset 0 0 18px #ff263344,
+      0 0 7px #e91f2d99;
+  }
+
+  to {
+    box-shadow:
+      inset 0 0 48px #ff182a88,
+      0 0 20px #ff2633dd;
+  }
+}
+
+
+
+@keyframes sanemi-final-rage-marks {
+  from {
+    opacity: .72;
+
+    transform:
+      translate(-51%, -53%) rotate(-7deg) scale(.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-49%, -47%) rotate(7deg) scale(1.12);
+  }
+}
+
+@keyframes giyu-final-sweat {
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-10px, 16px) rotate(-8deg) scale(.55);
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(20px, -25px) rotate(10deg) scale(1.15);
+  }
+}
+
+
+/* =========================================
+   キャラクター座標をtranslateで軽量化
+   ========================================= */
+
+/*
+ * 座標はJavaScriptのtranslateへ一本化する。
+ * transformは既存のジャンプ・攻撃・吹っ飛びに使用する。
+ */
+#giyu,
+#sanemi {
+  left: 0 !important;
+  right: auto !important;
+  top: 0 !important;
+
+  transition:
+    filter .12s !important;
+
+  will-change:
+    translate,
+    transform,
+    filter;
+}
+
+
+/* =========================================
+   スマホ：怒り演出の描画負荷を軽減
+   ========================================= */
+@media (max-width: 600px) {
+
+  /*
+   * 何重もの影はスマホで重いため、
+   * 赤と黄色の2段階だけ残す。
+   */
+  #stage.proximity-rage #sanemi,
+  #stage.proximity-fury #sanemi,
+  #stage.warning #sanemi {
+    filter:
+      drop-shadow(0 0 6px #ff473b) drop-shadow(0 0 11px #ffb23b) !important;
+  }
+
+  /*
+   * FINALの炎は形と動きを残し、
+   * 高負荷なblurと二重影を弱める。
+   */
+  #stage.final-rush #sanemi::before {
+    filter:
+      blur(1px) drop-shadow(0 0 10px #ff352d) !important;
+  }
+
+  /*
+   * 怒り顔の残像も3重から2重へ減らす。
+   */
+  #stage.final-rush #sanemiImage {
+    filter:
+      saturate(1.45) contrast(1.08) drop-shadow(0 0 8px #ff2738) drop-shadow(4px 0 0 #ffb32755) !important;
+  }
+}
+
+/* =========================================
+   画像版タイトルロゴ
+   ========================================= */
+
+.game-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0 auto 8px;
+  padding: 0 12px;
+
+  text-align: center;
+}
+
+.title-logo {
+  display: block;
+
+  width: min(100%, 430px);
+  height: auto;
+  max-height: 150px;
+
+  object-fit: contain;
+}
+
+/* スマホではプレイ画面を圧迫しない大きさにする */
+@media (max-width: 600px) {
+  .game-header {
+    margin-bottom: 4px;
+    padding-inline: 8px;
+  }
+
+  .title-logo {
+    width: min(94vw, 350px);
+    max-height: 105px;
+  }
+}
