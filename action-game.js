@@ -597,9 +597,19 @@ function dodgeResult(now) {
     const chainBonus =
         clearedDoubleCharge ? 100 : 0;
 
-    const gained =
-        baseGained + chainBonus;
+    /*
+     * ラスト10秒は回避点と二連突進ボーナスを1.5倍にする。
+     */
+    const finalRate =
+        finalRushStarted
+            ? 1.5
+            : 1;
 
+    const gained =
+        Math.round(
+            (baseGained + chainBonus) *
+            finalRate
+        );
     dodgeRank =
         perfect ? "perfect" :
             just ? "just" :
@@ -877,10 +887,10 @@ function feedOhagi(now) {
     const comboRate =
         1 + Math.min(combo - 1, 8) * .25;
 
-    /* FINAL中に食べさせると1.25倍。 */
+    /* FINAL中に食べさせると1.5倍。 */
     const finalRate =
         finalRushStarted
-            ? 1.25
+            ? 1.5
             : 1;
 
     /*

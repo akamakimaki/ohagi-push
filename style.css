@@ -5657,3 +5657,30 @@ main>.time-track {
     max-height: 105px;
   }
 }
+
+/*
+ * FINAL演出の得点倍率。
+ * 既存の「実弥、ブチギレ！」より少し下へ表示する。
+ */
+#finalRush em {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 80%;
+
+  color: #fff068;
+  font-size: clamp(18px, 4.5vw, 30px);
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: .06em;
+  white-space: nowrap;
+
+  transform:
+    translateX(-50%) rotate(-3deg);
+
+  -webkit-text-stroke: 1px #721019;
+
+  text-shadow:
+    3px 3px 0 #e32330,
+    6px 6px 0 #21060a;
+}
