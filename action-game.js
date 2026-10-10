@@ -1587,10 +1587,25 @@ playAgain.addEventListener(
 );
 
 shareResult.addEventListener("click", () => {
-    const text = `「おはぎを押しつけろ！」で${points}点！ おはぎ${ohagiCount}個！`;
-    const url = "https://akamakimaki.github.io/ohagi-push/";
-    open(`https://bsky.app/intent/compose?text=${encodeURIComponent(`${text}\n${url}`)}`, "_blank", "noopener");
+    const url =
+        "https://akamakimaki.github.io/ohagi-push/";
+
+    const text = [
+        `「おはぎを押しつけろ！」で${points.toLocaleString()}点！`,
+        "🍃をかわして、おはぎを食べさせろ！",
+        "",
+        url,
+        "",
+        "#おはぎを押しつけろ"
+    ].join("\n");
+
+    open(
+        `https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener"
+    );
 });
+
 privateSubmit.addEventListener("click", () => {
     /*
      * ゲーム終了後の得点を、
