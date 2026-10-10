@@ -155,8 +155,60 @@ function playEffect(audio) {
     });
 }
 
+/*
+ * iPhoneでは、操作イベント中に一度再生していない音声が
+ * 後から拒否されることがある。
+ * 開始ボタンを押した瞬間に無音で効果音を解放する。
+ */
+let effectSoundsUnlocked = false;
+
+function unlockEffectSounds() {
+    if (
+        effectSoundsUnlocked ||
+        !soundEnabled
+    ) {
+        return;
+    }
+
+    const sounds = [
+        hitSound,
+        windSound,
+        successSound,
+        timeupSound,
+        resultBgm
+    ];
+
+    effectSoundsUnlocked = true;
+
+    sounds.forEach(audio => {
+        const previousMuted = audio.muted;
+
+        audio.muted = true;
+        audio.currentTime = 0;
+
+        const promise = audio.play();
+
+        if (!promise) {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.muted = previousMuted;
+            return;
+        }
+
+        promise.then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.muted = previousMuted;
+        }).catch(() => {
+            audio.muted = previousMuted;
+            effectSoundsUnlocked = false;
+        });
+    });
+}
+
+
 const GAME_DURATION = 30000;
-const GIYU_FOLLOW = 22;
+const GIYU_FOLLOW = 30;
 const SANEMI_ROAM_SPEED = 240;
 const SANEMI_CHARGE_SPEED = 1050;
 const WARNING_DURATION = 520;
@@ -1374,6 +1426,8 @@ function endGame() {
 }
 
 function startGame() {
+    unlockEffectSounds();
+
     resultBgm.pause();
     resultBgm.currentTime = 0;
     window.clearTimeout(resetTimer);
@@ -1446,6 +1500,7 @@ function startGame() {
     action.disabled = true;
     action.textContent = "プレイ中！";
 }
+
 
 action.addEventListener("click", startGame);
 stage.addEventListener("pointerdown", beginControl);
@@ -1583,9 +1638,69 @@ soundButton.addEventListener("click", () => {
     }
 });
 
-bestDisplay.textContent = localStorage.getItem(BEST_KEY) || "0";
+/*
+ * 初回アクセスでは、CSSや画像が適用される前に
+ * キャラクター幅を取得することがある。
+ * レイアウト確定後に待機位置を再計算する。
+ */
+function fixReadyCharacterPositions() {
+    if (gameStarted || roundFinished) return;
+
+    resetCharacters(performance.now());
+
+    giyuImage.src =
+        "./images/giyu-normal.png";
+
+    sanemiImage.src =
+        "./images/sanemi-normal.png";
+
+    draw();
+}
+
+function scheduleReadyPositionFix() {
+    /*
+     * iPhone内ブラウザの表示幅が確定するまで
+     * 2フレーム待ってから再配置する。
+     */
+    requestAnimationFrame(() => {
+        requestAnimationFrame(
+            fixReadyCharacterPositions
+        );
+    });
+
+    /*
+     * ブラウザ上部・下部バーの展開が遅い場合の保険。
+     * その前にゲームを始めた場合は何もしない。
+     */
+    window.setTimeout(
+        fixReadyCharacterPositions,
+        250
+    );
+}
+
+bestDisplay.textContent =
+    localStorage.getItem(BEST_KEY) || "0";
+
 stage.classList.add("free-motion");
+
 resetCharacters();
-giyuImage.src = "./images/giyu-normal.png";
+
+giyuImage.src =
+    "./images/giyu-normal.png";
+
+sanemiImage.src =
+    "./images/sanemi-normal.png";
+
 draw();
+
+window.addEventListener(
+    "load",
+    scheduleReadyPositionFix
+);
+
+window.addEventListener(
+    "pageshow",
+    scheduleReadyPositionFix
+);
+
 requestAnimationFrame(update);

@@ -5684,3 +5684,46 @@ main>.time-track {
     3px 3px 0 #e32330,
     6px 6px 0 #21060a;
 }
+
+/* =========================================
+   スマホ：操作中の描画負荷を軽減
+   ========================================= */
+
+@media (max-width: 600px),
+(pointer: coarse) {
+
+  #stage.free-motion #giyu,
+  #stage.free-motion #sanemi {
+    transition: none !important;
+    will-change: translate, transform;
+  }
+
+  /*
+   * 義勇の待機揺れは残しつつ、
+   * 更新頻度を少し抑える。
+   */
+  #stage.free-motion:not(.hit):not(.success) #giyu {
+    animation-duration: .56s !important;
+  }
+
+  /*
+   * スマホでは二重影を一重にして、
+   * 突進中の再描画負荷を抑える。
+   */
+  #stage.free-motion.attacking #sanemi {
+    filter:
+      drop-shadow(0 0 8px #ff4938) !important;
+  }
+
+  #stage.free-motion.proximity-rage #sanemi {
+    animation-duration: .16s !important;
+    filter:
+      drop-shadow(0 0 9px #ff5438) !important;
+  }
+
+  #stage.free-motion.proximity-fury #sanemi {
+    animation-duration: .1s !important;
+    filter:
+      drop-shadow(0 0 13px #ff2929) !important;
+  }
+}
